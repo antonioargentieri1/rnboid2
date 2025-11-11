@@ -1,0 +1,11 @@
+# RNBO Android Replacer v2.2
+# Python 3.7+ required
+
+# No external dependencies required!
+# Uses only Python standard library:
+# - tkinter (GUI)
+# - pathlib (file operations)
+# - json (JSON parsing)
+# - shutil (file copying)
+# - threading (async operations)
+# - re (regex)

@@ -1,0 +1,41 @@
+"""
+themes.xml Template
+"""
+
+
+class ThemesTemplate:
+    @staticmethod
+    def get_content():
+        return '''<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.RnboTest" parent="Theme.MaterialComponents.NoActionBar">
+        <!-- Primary colors - Dark theme -->
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">@color/black</item>
+        <item name="colorOnPrimary">@color/black</item>
+
+        <!-- Secondary colors -->
+        <item name="colorSecondary">@color/gray_medium</item>
+        <item name="colorSecondaryVariant">@color/gray_dark</item>
+        <item name="colorOnSecondary">@color/white</item>
+
+        <!-- Background colors -->
+        <item name="android:colorBackground">@color/black</item>
+        <item name="colorSurface">@color/black</item>
+        <item name="colorOnSurface">@color/white</item>
+
+        <!-- Status bar -->
+        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:windowLightStatusBar">false</item>
+
+        <!-- Text colors -->
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/gray_light</item>
+
+        <!-- Slider colors (SeekBar) -->
+        <item name="colorControlNormal">@color/gray_dark</item>
+        <item name="colorControlActivated">@color/white</item>
+        <item name="colorControlHighlight">@color/gray_light</item>
+    </style>
+</resources>
+'''
