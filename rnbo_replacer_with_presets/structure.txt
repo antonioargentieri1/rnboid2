@@ -1,0 +1,38 @@
+rnbo_replacer/
+│
+├── 🚀 main.py                          [Entry Point - 30 righe]
+│
+├── 📚 README.md                        [Documentazione completa]
+├── 📝 QUICKSTART.md                    [Guida rapida]
+├── 📋 requirements.txt                 [Dipendenze (nessuna!)]
+│
+├── 📁 gui/                            [Layer Interfaccia - 300 righe]
+│   ├── __init__.py
+│   └── main_window.py                 [GUI principale + eventi]
+│
+├── 📁 core/                           [Layer Business Logic - 300 righe]
+│   ├── __init__.py
+│   ├── replacer.py                    [Orchestrazione sostituzione]
+│   └── analyzer.py                    [Analisi export RNBO]
+│
+├── 📁 templates/                      [Layer Templates - 500 righe]
+│   ├── __init__.py
+│   ├── mainactivity.py                [Generator MainActivity]
+│   ├── msploader.py                   [MSPLoader ottimizzato]
+│   └── layout.py                      [Layout XML]
+│
+├── 📁 utils/                          [Layer Utility - 30 righe]
+│   ├── __init__.py
+│   └── logger.py                      [Sistema logging]
+│
+├── 📄 mainactivity_extracted.txt      [Template MainActivity completo]
+└── 🧪 test_structure.py               [Test validazione]
+
+TOTALE: ~1200 righe organizzate vs 1785 righe monolitiche
+
+VANTAGGI:
+✅ Separazione responsabilità
+✅ File < 300 righe (facilmente leggibili)
+✅ Modulare ed estendibile
+✅ Facile da debuggare
+✅ Testabile

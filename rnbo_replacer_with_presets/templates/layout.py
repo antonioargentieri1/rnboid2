@@ -1,0 +1,131 @@
+"""
+Layout Template - activity_main.xml (STEP 4/5: Camera Preview + Hand Overlay)
+"""
+
+
+class LayoutTemplate:
+    @staticmethod
+    def get_content():
+        return '''<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    tools:context=".MainActivity">
+
+    <!-- STEP 5: Camera Preview (bottom-left corner) - DISABLED -->
+    <!--
+    <androidx.camera.view.PreviewView
+        android:id="@+id/cameraPreview"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_margin="16dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+    -->
+
+    <!-- Hand Overlay View (sopra la camera) - DISABLED -->
+    <!--
+    <com.example.rnbo_test.HandOverlayView
+        android:id="@+id/handOverlay"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_margin="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+    -->
+
+    <!-- Toggle Camera Button (top-right corner) - DISABLED -->
+    <!--
+    <Button
+        android:id="@+id/btnToggleCamera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="[CAM] Camera"
+        android:textSize="12sp"
+        android:onClick="onToggleCameraClick"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    -->
+
+    <!-- VERSION A: Flash Toggle Button (below camera button) - DISABLED -->
+    <!--
+    <Button
+        android:id="@+id/btnToggleFlash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="💡 Flash"
+        android:textSize="12sp"
+        android:onClick="onToggleFlashClick"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnToggleCamera" />
+    -->
+
+<!-- FIXED HEADER AREA -->
+    <LinearLayout
+        android:id="@+id/fixed_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#1a1a1a"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        
+        <!-- Mode buttons will be added here programmatically -->
+        
+        <!-- Live mode fixed controls -->
+        <LinearLayout
+            android:id="@+id/live_fixed_controls"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone" />
+            
+    </LinearLayout>
+
+    <!-- SCROLLABLE PARAMETERS AREA -->
+    <ScrollView
+        android:id="@+id/mainScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/fixed_header"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        
+        <LinearLayout
+            android:id="@+id/AppBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="32dp"
+            android:orientation="vertical">
+            
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="30dp" />
+            
+            <LinearLayout
+                android:id="@+id/ParamHolder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+            
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="30dp" />
+                
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
+'''

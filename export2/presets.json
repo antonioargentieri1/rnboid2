@@ -1,0 +1,31 @@
+[
+  {
+    "name": "granular",
+    "preset": {
+      "attack": {
+        "value": 10
+      },
+      "gain": {
+        "value": 124
+      },
+      "grLenght": {
+        "value": 300
+      },
+      "pbSpeed": {
+        "value": 2
+      },
+      "release": {
+        "value": 500
+      },
+      "startTime": {
+        "value": 1560
+      },
+      "triggerSpeed": {
+        "value": 0
+      },
+      "ui_XYgraph_trigger": {
+        "value": 0
+      }
+    }
+  }
+]
