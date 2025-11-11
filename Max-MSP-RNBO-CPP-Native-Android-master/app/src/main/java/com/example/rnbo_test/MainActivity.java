@@ -48,16 +48,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-// STEP 4: GestureManager imports (DISABLED - TODO: Re-enable later)
-/*
-import androidx.camera.view.PreviewView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.widget.Toast;
-import com.google.mediapipe.tasks.vision.handlandmarker.HandLandmarkerResult;
-*/
 
 
 public class MainActivity extends AppCompatActivity {
@@ -67,15 +57,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private ActivityMainBinding binding;
-    
-    // STEP 4: GestureManager integration (DISABLED - TODO: Re-enable later)
-    /*
-    private GestureManager gestureManager;
-    private PreviewView cameraPreview;
-    private HandOverlayView handOverlay;
-    private static final int CAMERA_PERMISSION_REQUEST = 100;
-    private boolean cameraEnabled = false;
-    */
 
     private Map<String, PureDataSlider> sliders;
     private LinearLayout paramHolder;
@@ -231,11 +212,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        
-        // STEP 4: Initialize GestureManager (DISABLED - TODO: Re-enable later)
-        // initializeGestureManager();
 
-        
+
         // Get UI containers
         fixedHeader = findViewById(R.id.fixed_header);
         liveFixedControls = findViewById(R.id.live_fixed_controls);
@@ -954,13 +932,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         unregisterSensorListeners();
-        
-        // STEP 4: Stop camera when app goes to background (DISABLED)
-        /*
-        if (gestureManager != null) {
-            gestureManager.stopCamera();
-        }
-        */
     }
     
     @Override
@@ -969,13 +940,6 @@ public class MainActivity extends AppCompatActivity {
         if (!currentMode.equals("setup")) {
             registerSensorListeners();
         }
-        
-        // STEP 4: Restart camera if it was enabled (DISABLED)
-        /*
-        if (cameraEnabled && gestureManager != null && cameraPreview != null) {
-            gestureManager.startCamera(this, cameraPreview);
-        }
-        */
     }
     
     private void refreshParameterDisplay() {
@@ -2789,215 +2753,5 @@ public class MainActivity extends AppCompatActivity {
     public native boolean loadBuffer(String bufferId, String filePath);
 
     
-    // ============================================================================
-    // STEP 4: GESTUREMANAGER INTEGRATION (DISABLED - TODO: Re-enable later)
-    // ============================================================================
-    
-    /*
-    **
-     * Initialize GestureManager and setup camera
-     *
-    private void initializeGestureManager() {
-        Log.d("MainActivity", "🎥 Initializing GestureManager...");
-        
-        // Create GestureManager
-        gestureManager = new GestureManager(this);
-        
-        // Set callback for hand detection
-        gestureManager.setCallback(new GestureManager.GestureCallback() {
-            @Override
-            public void onHandsDetected(HandLandmarkerResult result) {
-                handleHandDetection(result);
-            }
-            
-            @Override
-            public void onError(String error) {
-                Log.e("MainActivity", "GestureManager error: " + error);
-                runOnUiThread(() -> {
-                    Toast.makeText(MainActivity.this, 
-                        "Hand tracking error: " + error, 
-                        Toast.LENGTH_SHORT).show();
-                });
-            }
-        });
-        
-        // Get PreviewView from layout (if exists)
-        cameraPreview = findViewById(R.id.cameraPreview);
-        handOverlay = findViewById(R.id.handOverlay);
-        
-        // Request camera permission if not granted
-        if (checkCameraPermission()) {
-            startHandTracking();
-        } else {
-            requestCameraPermission();
-        }
-    }
-    
-    **
-     * Handle hand detection results
-     *
-    private void handleHandDetection(HandLandmarkerResult result) {
-        int numHands = result.landmarks().size();
-        
-        if (numHands > 0) {
-            // Log detection (for STEP 4 testing)
-            int numLandmarks = result.landmarks().get(0).size();
-            Log.d("HandTracking", "[HAND] Hand detected! " + numLandmarks + " landmarks");
-            
-            // Get wrist position (landmark 0)
-            float wristX = result.landmarks().get(0).get(0).x();
-            float wristY = result.landmarks().get(0).get(0).y();
-            Log.d("HandTracking", "   Wrist: x=" + String.format("%.3f", wristX) + 
-                  " y=" + String.format("%.3f", wristY));
-            
-            // TODO STEP 6: Add gesture recognition here
-            
-            // Update overlay view with landmarks
-            if (handOverlay != null) {
-                handOverlay.updateLandmarks(result);
-            }
-            // TODO STEP 7: Map gestures to RNBO parameters
-            
-        } else {
-            // No hand detected
-            Log.d("HandTracking", "⚪ No hand");
-            
-            // Clear overlay
-            if (handOverlay != null) {
-                handOverlay.clear();
-            }
-        }
-    }
-    
-    **
-     * Start hand tracking with camera
-     *
-    private void startHandTracking() {
-        if (gestureManager != null && cameraPreview != null) {
-            Log.d("MainActivity", "[CAMERA] Starting camera for hand tracking...");
-            gestureManager.startCamera(this, cameraPreview);
-            cameraEnabled = true;
-            
-            runOnUiThread(() -> {
-                Toast.makeText(this, 
-                    "Hand tracking started! Show your hand", 
-                    Toast.LENGTH_LONG).show();
-            });
-        } else {
-            Log.w("MainActivity", "[WARN] Cannot start camera: " + 
-                  (gestureManager == null ? "GestureManager null" : "PreviewView null"));
-        }
-    }
-    
-    **
-     * Stop hand tracking
-     *
-    private void stopHandTracking() {
-        if (gestureManager != null) {
-            gestureManager.stopCamera();
-            cameraEnabled = false;
-            Log.d("MainActivity", "[CAMERA] Camera stopped");
-        }
-    }
-    
-    **
-     * Toggle hand tracking on/off
-     *
-    public void toggleHandTracking() {
-        if (cameraEnabled) {
-            stopHandTracking();
-            Toast.makeText(this, "Hand tracking OFF", Toast.LENGTH_SHORT).show();
-        } else {
-            if (checkCameraPermission()) {
-                startHandTracking();
-            } else {
-                requestCameraPermission();
-            }
-        }
-    }
-    
-    **
-     * STEP 5: onClick handler for camera toggle button
-     *
-    public void onToggleCameraClick(View view) {
-        toggleHandTracking();
-    }
-    
-    **
-     * VERSION A: onClick handler for flash toggle button
-     *
-    public void onToggleFlashClick(View view) {
-        if (gestureManager != null) {
-            if (gestureManager.hasFlash()) {
-                gestureManager.toggleFlash();
-                
-                // Update button text
-                Button btn = (Button) view;
-                if (gestureManager.isFlashEnabled()) {
-                    btn.setText("💡 Flash ON");
-                    Toast.makeText(this, "Flash ON", Toast.LENGTH_SHORT).show();
-                } else {
-                    btn.setText("💡 Flash OFF");
-                    Toast.makeText(this, "Flash OFF", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(this, "Flash not available", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-    
-    **
-     * Check if camera permission is granted
-     *
-    private boolean checkCameraPermission() {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED;
-    }
-    
-    **
-     * Request camera permission
-     *
-    private void requestCameraPermission() {
-        Log.d("MainActivity", "📸 Requesting camera permission...");
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.CAMERA},
-                CAMERA_PERMISSION_REQUEST);
-    }
-    
-    **
-     * Handle permission result
-     *
-    @Override
-    public void onRequestPermissionsResult(int requestCode, 
-                                          @NonNull String[] permissions, 
-                                          @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        
-        if (requestCode == CAMERA_PERMISSION_REQUEST) {
-            if (grantResults.length > 0 && 
-                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d("MainActivity", "[PERMISSION] Camera permission granted");
-                startHandTracking();
-            } else {
-                Log.w("MainActivity", "[PERMISSION] Camera permission denied");
-                Toast.makeText(this, 
-                    "Camera permission required for hand tracking", 
-                    Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-    */
-    
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // Release GestureManager resources (DISABLED)
-        /*
-        if (gestureManager != null) {
-            gestureManager.release();
-            gestureManager = null;
-        }
-        */
-    }
 
 }
