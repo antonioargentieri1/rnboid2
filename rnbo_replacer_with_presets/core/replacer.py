@@ -178,6 +178,16 @@ class RNBOReplacer:
         shutil.copytree(self.cpp_dir, backup_dir)
         self.logger.log(f"  [OK] Backup creato: {backup_dir}")
 
+    def _backup_java(self, java_dir):
+        """Crea backup dei file Java"""
+        backup_dir = self.template / "app" / "src" / "main" / "java_backup"
+
+        if backup_dir.exists():
+            shutil.rmtree(backup_dir)
+
+        shutil.copytree(java_dir, backup_dir / java_dir.name)
+        self.logger.log(f"  [OK] Backup Java creato: {backup_dir}")
+
     def _replace_cpp_files(self, rename_cpp):
         """Sostituisce i file .cpp dell'export"""
         self.logger.log("\n[REPLACE] Step 2: Sostituzione file export C++...")
@@ -358,6 +368,124 @@ class RNBOReplacer:
             f.write(content)
 
         self.logger.log("  [OK] MainActivity.java aggiornato")
+
+    def _generate_layout(self):
+        """Genera activity_main.xml"""
+        self.logger.log("\n[GENERATE] Step 8: Generazione activity_main.xml...")
+
+        # Backup
+        xml_file = self.res_dir / "activity_main.xml"
+        if xml_file.exists():
+            backup_dir = self.template / "app" / "src" / "main" / "java_backup"
+            backup_dir.mkdir(parents=True, exist_ok=True)
+            backup_file = backup_dir / "activity_main.xml.backup"
+            shutil.copy2(xml_file, backup_file)
+            self.logger.log(f"  [BACKUP] Backup XML: java_backup/activity_main.xml.backup")
+
+        # Genera nuovo XML
+        content = LayoutTemplate.get_content()
+
+        with open(xml_file, 'w', encoding='utf-8') as f:
+            f.write(content)
+
+        self.logger.log("  [OK] activity_main.xml aggiornato")
+
+    def _generate_build_gradle(self):
+        """Genera build.gradle"""
+        self.logger.log("\n[GENERATE] Step 9: Generazione build.gradle...")
+
+        gradle_file = self.template / "app" / "build.gradle"
+
+        # Backup
+        if gradle_file.exists():
+            backup_dir = self.template / "app" / "gradle_backup"
+            backup_dir.mkdir(parents=True, exist_ok=True)
+            backup_file = backup_dir / "build.gradle.backup"
+            shutil.copy2(gradle_file, backup_file)
+            self.logger.log(f"  [BACKUP] Backup Gradle: gradle_backup/build.gradle.backup")
+
+        # Genera nuovo build.gradle
+        content = BuildGradleTemplate.get_app_build_gradle()
+
+        with open(gradle_file, 'w', encoding='utf-8') as f:
+            f.write(content)
+
+        self.logger.log("  [OK] build.gradle aggiornato")
+
+    def _generate_android_manifest(self):
+        """Genera AndroidManifest.xml"""
+        self.logger.log("\n[GENERATE] Step 10: Generazione AndroidManifest.xml...")
+
+        manifest_file = self.template / "app" / "src" / "main" / "AndroidManifest.xml"
+
+        # Backup
+        if manifest_file.exists():
+            backup_dir = self.template / "app" / "src" / "main" / "manifest_backup"
+            backup_dir.mkdir(parents=True, exist_ok=True)
+            backup_file = backup_dir / "AndroidManifest.xml.backup"
+            shutil.copy2(manifest_file, backup_file)
+            self.logger.log(f"  [BACKUP] Backup Manifest: manifest_backup/AndroidManifest.xml.backup")
+
+        # Genera nuovo AndroidManifest
+        content = AndroidManifestTemplate.get_content()
+
+        with open(manifest_file, 'w', encoding='utf-8') as f:
+            f.write(content)
+
+        self.logger.log("  [OK] AndroidManifest.xml aggiornato")
+
+    def _generate_cmakelists(self):
+        """Genera CMakeLists.txt con Oboe configurato"""
+        self.logger.log("\n[GENERATE] Step 11: Generazione CMakeLists.txt...")
+
+        cmake_file = self.cpp_dir / "CMakeLists.txt"
+
+        # Backup
+        if cmake_file.exists():
+            backup_dir = self.cpp_dir.parent / "cpp_backup"
+            backup_dir.mkdir(parents=True, exist_ok=True)
+            backup_file = backup_dir / "CMakeLists.txt.backup"
+            shutil.copy2(cmake_file, backup_file)
+            self.logger.log(f"  [BACKUP] Backup CMake: cpp_backup/CMakeLists.txt.backup")
+
+        # Genera nuovo CMakeLists
+        content = CMakeListsTemplate.get_content()
+
+        with open(cmake_file, 'w', encoding='utf-8') as f:
+            f.write(content)
+
+        self.logger.log("  [OK] CMakeLists.txt aggiornato con Oboe")
+
+    def _generate_resources(self):
+        """Genera themes.xml e colors.xml"""
+        self.logger.log("\n[GENERATE] Step 12: Generazione resources (themes & colors)...")
+
+        values_dir = self.template / "app" / "src" / "main" / "res" / "values"
+        values_dir.mkdir(parents=True, exist_ok=True)
+
+        # themes.xml
+        themes_file = values_dir / "themes.xml"
+        if themes_file.exists():
+            backup_dir = self.template / "app" / "src" / "main" / "res_backup"
+            backup_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(themes_file, backup_dir / "themes.xml.backup")
+
+        with open(themes_file, 'w', encoding='utf-8') as f:
+            f.write(ThemesTemplate.get_content())
+
+        self.logger.log("  [OK] themes.xml")
+
+        # colors.xml
+        colors_file = values_dir / "colors.xml"
+        if colors_file.exists():
+            backup_dir = self.template / "app" / "src" / "main" / "res_backup"
+            backup_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(colors_file, backup_dir / "colors.xml.backup")
+
+        with open(colors_file, 'w', encoding='utf-8') as f:
+            f.write(ColorsTemplate.get_content())
+
+        self.logger.log("  [OK] colors.xml")
 
     def _log_completion(self):
         """Log di completamento"""
