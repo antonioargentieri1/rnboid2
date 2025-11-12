@@ -187,11 +187,14 @@ struct XYPadView: View {
     }
 
     private func updateParameters() {
-        xyPadManager.updateParameters(
-            parameters: rnbo.parameters,
-            customRanges: modeManager.customRanges,
-            rnbo: rnbo
-        )
+        // Defer to next run loop to avoid "Publishing changes from within view updates" warning
+        DispatchQueue.main.async {
+            xyPadManager.updateParameters(
+                parameters: rnbo.parameters,
+                customRanges: modeManager.customRanges,
+                rnbo: rnbo
+            )
+        }
     }
 }
 
