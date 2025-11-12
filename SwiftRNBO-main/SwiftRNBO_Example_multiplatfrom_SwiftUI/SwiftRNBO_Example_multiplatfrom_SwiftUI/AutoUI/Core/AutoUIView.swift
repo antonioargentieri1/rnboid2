@@ -13,6 +13,7 @@ struct AutoUIView: View {
     @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
     @StateObject var modeManager = ModeManager()
     @StateObject var presetManager = PresetManager()
+    @StateObject var xyPadManager = XYPadManager()
 
     @State private var sortOrder: ParameterSortOrder = .order
     @State private var searchQuery: String = ""
@@ -24,7 +25,7 @@ struct AutoUIView: View {
                 .padding(.horizontal)
                 .padding(.top, 8)
 
-            // Quick Presets (LIVE mode header)
+            // Quick Presets + XY Pad toggle (LIVE mode header)
             if modeManager.currentMode == .live {
                 QuickPresetsView(parameters: $rnbo.parameters)
             }
@@ -34,15 +35,19 @@ struct AutoUIView: View {
                 setupModeControls
             }
 
-            // Content (Presets Manager or Parameters List)
+            // Content (Presets Manager, XY Pad, or Parameters List)
             if modeManager.currentMode == .presets {
                 PresetsManagerView(parameters: $rnbo.parameters)
+            } else if modeManager.currentMode == .live && xyPadManager.isEnabled {
+                // XY Pad view (hides parameters like Android)
+                xyPadView
             } else {
                 parametersList
             }
         }
         .environmentObject(modeManager)
         .environmentObject(presetManager)
+        .environmentObject(xyPadManager)
         .onAppear {
             initializeModeManager()
         }
@@ -100,6 +105,15 @@ struct AutoUIView: View {
                 }
             }
             .padding(.vertical)
+        }
+    }
+
+    // MARK: - XY Pad View
+
+    private var xyPadView: some View {
+        let labels = xyPadManager.getAxisLabels(parameters: rnbo.parameters)
+        return ScrollView {
+            XYPadView(xLabel: labels.xLabel, yLabel: labels.yLabel)
         }
     }
 

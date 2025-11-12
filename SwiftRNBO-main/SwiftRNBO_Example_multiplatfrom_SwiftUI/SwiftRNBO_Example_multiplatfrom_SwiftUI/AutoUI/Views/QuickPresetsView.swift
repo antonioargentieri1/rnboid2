@@ -15,6 +15,7 @@ struct QuickPresetsView: View {
     @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
     @EnvironmentObject var modeManager: ModeManager
     @EnvironmentObject var presetManager: PresetManager
+    @EnvironmentObject var xyPadManager: XYPadManager
 
     @Binding var parameters: [RNBOParameter]
 
@@ -27,37 +28,68 @@ struct QuickPresetsView: View {
     ]
 
     var body: some View {
-        if !presetManager.quickPresets.isEmpty {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("QUICK PRESETS")
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.secondary)
-                    .padding(.horizontal)
+        VStack(alignment: .leading, spacing: 12) {
+            // XY Pad toggle button (matches Android Lines 331-338)
+            xyPadToggleButton
 
-                LazyVGrid(columns: columns, spacing: 8) {
-                    ForEach(Array(presetManager.quickPresets.enumerated()), id: \.element.id) { index, preset in
-                        QuickPresetButton(
-                            number: index + 1,
-                            preset: preset,
-                            onTap: {
-                                loadQuickPreset(preset)
-                            }
-                        )
-                    }
-                }
+            // Quick Presets section
+            if !presetManager.quickPresets.isEmpty {
+                quickPresetsSection
+            }
+
+            // Interpolation progress (shown when morphing)
+            if presetManager.isInterpolating {
+                interpolationProgressView
+            }
+        }
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.gray.opacity(0.1))
+        )
+        .padding(.horizontal)
+    }
+
+    // MARK: - XY Pad Toggle Button
+
+    private var xyPadToggleButton: some View {
+        Button(action: {
+            xyPadManager.isEnabled.toggle()
+        }) {
+            Text(xyPadManager.isEnabled ? "XY PAD ON" : "XY PAD OFF")
+                .font(.caption)
+                .fontWeight(.bold)
+                .foregroundColor(xyPadManager.isEnabled ? .black : .white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(xyPadManager.isEnabled ? Color.white : Color.black)
+                .cornerRadius(6)
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal)
+    }
+
+    // MARK: - Quick Presets Section
+
+    private var quickPresetsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("QUICK PRESETS")
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundColor(.secondary)
                 .padding(.horizontal)
 
-                // Interpolation progress (shown when morphing)
-                if presetManager.isInterpolating {
-                    interpolationProgressView
+            LazyVGrid(columns: columns, spacing: 8) {
+                ForEach(Array(presetManager.quickPresets.enumerated()), id: \.element.id) { index, preset in
+                    QuickPresetButton(
+                        number: index + 1,
+                        preset: preset,
+                        onTap: {
+                            loadQuickPreset(preset)
+                        }
+                    )
                 }
             }
-            .padding(.vertical, 8)
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.gray.opacity(0.1))
-            )
             .padding(.horizontal)
         }
     }

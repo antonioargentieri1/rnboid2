@@ -27,6 +27,9 @@ struct Preset: Codable, Identifiable, Equatable {
     // Quick preset flag (for 8 quick buttons in LIVE mode)
     var isQuickPreset: Bool
 
+    // XY Pad mappings per parameter (paramId -> XYPadMapping)
+    var xyPadMappings: [String: XYPadMapping]
+
     // Future: Sensor controls (when sensors are implemented)
     // var sensorControls: [String: SensorControl] = [:]
     // var sensorsGloballyEnabled: Bool = false
@@ -36,6 +39,7 @@ struct Preset: Codable, Identifiable, Equatable {
         parameterValues: [String: Double],
         customRanges: [String: CustomRange],
         liveParameters: Set<String>,
+        xyPadMappings: [String: XYPadMapping] = [:],
         isQuickPreset: Bool = false
     ) {
         self.id = UUID()
@@ -44,6 +48,7 @@ struct Preset: Codable, Identifiable, Equatable {
         self.parameterValues = parameterValues
         self.customRanges = customRanges
         self.liveParameters = liveParameters
+        self.xyPadMappings = xyPadMappings
         self.isQuickPreset = isQuickPreset
     }
 

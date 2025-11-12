@@ -56,7 +56,8 @@ class PresetManager: ObservableObject {
         name: String,
         parameters: [RNBOParameter],
         customRanges: [String: CustomRange],
-        liveParameters: Set<String>
+        liveParameters: Set<String>,
+        xyPadMappings: [String: XYPadMapping]
     ) {
         // Capture current parameter values
         var parameterValues: [String: Double] = [:]
@@ -67,12 +68,16 @@ class PresetManager: ObservableObject {
         // Deep copy custom ranges
         let copiedRanges = customRanges.mapValues { CustomRange(min: $0.customMin, max: $0.customMax, enabled: $0.enabled) }
 
+        // Deep copy XY Pad mappings
+        let copiedMappings = xyPadMappings.mapValues { XYPadMapping(axis: $0.axis, invert: $0.invert) }
+
         // Create preset
         let preset = Preset(
             name: name,
             parameterValues: parameterValues,
             customRanges: copiedRanges,
             liveParameters: liveParameters,
+            xyPadMappings: copiedMappings,
             isQuickPreset: false
         )
 

@@ -12,6 +12,7 @@ import SwiftUI
 struct ParameterRow: View {
     @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
     @EnvironmentObject var modeManager: ModeManager
+    @EnvironmentObject var xyPadManager: XYPadManager
 
     @Binding var parameter: RNBOParameter
     let mode: UIMode
@@ -32,6 +33,10 @@ struct ParameterRow: View {
             // Setup mode: Show custom range controls
             if mode == .setup {
                 customRangeSection
+                    .padding(.leading, mode == .setup ? 44 : 0) // Align with slider
+
+                // XY Pad assignment section
+                xyPadSection
                     .padding(.leading, mode == .setup ? 44 : 0) // Align with slider
             }
         }
@@ -156,6 +161,43 @@ struct ParameterRow: View {
 
     private var customRange: CustomRange? {
         modeManager.customRanges[parameter.id]
+    }
+
+    // MARK: - XY Pad Section
+
+    private var xyPadSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("XY Pad Assignment")
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundColor(.secondary)
+
+            // Axis picker
+            Picker("Axis", selection: Binding(
+                get: { xyPadManager.getMapping(for: parameter.id).axis },
+                set: { newAxis in
+                    xyPadManager.setMapping(for: parameter.id, axis: newAxis)
+                }
+            )) {
+                ForEach(XYPadAxis.allCases, id: \.self) { axis in
+                    Text(axis.displayName).tag(axis)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            // Invert toggle (shown when axis is not none)
+            if xyPadManager.getMapping(for: parameter.id).axis != .none {
+                Toggle(isOn: Binding(
+                    get: { xyPadManager.getMapping(for: parameter.id).invert },
+                    set: { _ in xyPadManager.toggleInvert(for: parameter.id) }
+                )) {
+                    Text("Invert")
+                        .font(.caption)
+                }
+                .toggleStyle(SwitchToggleStyle(tint: .orange))
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
 
