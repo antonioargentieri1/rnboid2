@@ -86,15 +86,21 @@ struct ParameterRow: View {
                     // Range slider
                     RangeSlider(
                         minValue: Binding(
-                            get: { range.customMin },
+                            get: {
+                                modeManager.customRanges[parameter.id]?.customMin ?? parameter.info.minimum
+                            },
                             set: { newMin in
-                                modeManager.updateCustomRange(parameter.id, min: newMin, max: range.customMax)
+                                let currentMax = modeManager.customRanges[parameter.id]?.customMax ?? parameter.info.maximum
+                                modeManager.updateCustomRange(parameter.id, min: newMin, max: currentMax)
                             }
                         ),
                         maxValue: Binding(
-                            get: { range.customMax },
+                            get: {
+                                modeManager.customRanges[parameter.id]?.customMax ?? parameter.info.maximum
+                            },
                             set: { newMax in
-                                modeManager.updateCustomRange(parameter.id, min: range.customMin, max: newMax)
+                                let currentMin = modeManager.customRanges[parameter.id]?.customMin ?? parameter.info.minimum
+                                modeManager.updateCustomRange(parameter.id, min: currentMin, max: newMax)
                             }
                         ),
                         bounds: parameter.info.minimum...parameter.info.maximum,
