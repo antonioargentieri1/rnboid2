@@ -38,7 +38,7 @@ struct AutoSlider: View {
                 Group {
                     if let step = stepSize {
                         Slider(
-                            value: $parameter.valueNormalized,
+                            value: sliderBinding,
                             in: 0...1,
                             step: step
                         ) {
@@ -57,12 +57,9 @@ struct AutoSlider: View {
                             }
                         }
                         .accentColor(accentColor)
-                        .onChange(of: parameter.valueNormalized) { newValue in
-                            rnbo.setParameterValueNormalized(to: newValue, at: parameter.info.index)
-                        }
                     } else {
                         Slider(
-                            value: $parameter.valueNormalized,
+                            value: sliderBinding,
                             in: 0...1
                         ) {
                             Text(displayName)
@@ -80,9 +77,6 @@ struct AutoSlider: View {
                             }
                         }
                         .accentColor(accentColor)
-                        .onChange(of: parameter.valueNormalized) { newValue in
-                            rnbo.setParameterValueNormalized(to: newValue, at: parameter.info.index)
-                        }
                     }
                 }
 
@@ -121,10 +115,34 @@ struct AutoSlider: View {
     }
 
     private var displayValue: Double {
-        // Clamp value to custom range if enabled
-        let value = parameter.value
-        let range = effectiveRange
-        return max(range.min, min(range.max, value))
+        parameter.value
+    }
+
+    /// Custom binding that maps slider (0-1) to effective range (custom or original)
+    /// This matches Android's SliderListener.onProgressChanged logic
+    private var sliderBinding: Binding<Double> {
+        Binding(
+            get: {
+                // Get current value from parameter
+                let currentValue = parameter.value
+                let range = effectiveRange
+
+                // Normalize to effective range: (value - min) / (max - min)
+                let normalized = (currentValue - range.min) / (range.max - range.min)
+                return max(0, min(1, normalized))
+            },
+            set: { sliderPosition in
+                // Map slider position (0-1) to effective range
+                let range = effectiveRange
+                let mappedValue = range.min + sliderPosition * (range.max - range.min)
+
+                // Set to RNBO using actual value (not normalized)
+                rnbo.setParameterValue(to: mappedValue, at: parameter.info.index)
+
+                // Update parameter binding
+                parameter.value = mappedValue
+            }
+        )
     }
 }
 
