@@ -56,7 +56,14 @@ class RNBOAnalyzer:
             with open(preset_file, 'r') as f:
                 self.presets = json.load(f)
 
-            preset_count = len(self.presets.get('presets', []))
+            # Handle both list and dict formats
+            if isinstance(self.presets, list):
+                preset_count = len(self.presets)
+            elif isinstance(self.presets, dict):
+                preset_count = len(self.presets.get('presets', []))
+            else:
+                preset_count = 0
+
             self.logger.success(f"Found {preset_count} presets")
         else:
             self.logger.info("presets.json not found (optional)")
