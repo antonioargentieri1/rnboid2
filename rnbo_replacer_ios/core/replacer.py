@@ -56,7 +56,8 @@ class IOSReplacer:
                 "Core/ParameterFilter.swift",
                 "Core/AutoUIView.swift",
                 "Widgets/AutoSlider.swift",
-                "Widgets/ParameterRow.swift"
+                "Widgets/ParameterRow.swift",
+                "Widgets/RangeSlider.swift"
             ]
             for file in autoui_files:
                 if (autoui_dir / file).exists():
@@ -96,8 +97,14 @@ class IOSReplacer:
             if self.output.exists():
                 shutil.rmtree(self.output)
 
-            # Copy entire template
-            shutil.copytree(self.template, self.output)
+            # Copy only the Xcode project directory (not the entire SwiftRNBO-main folder)
+            project_dir = self.template / "SwiftRNBO_Example_multiplatfrom_SwiftUI"
+
+            if not project_dir.exists():
+                self.logger.error(f"Project directory not found: {project_dir}")
+                return False
+
+            shutil.copytree(project_dir, self.output)
             self.logger.success(f"Template copied to: {self.output}")
 
             return True
@@ -113,8 +120,7 @@ class IOSReplacer:
         try:
             # Target RNBO directory in output
             output_rnbo_dir = (
-                self.output / "SwiftRNBO_Example_multiplatfrom_SwiftUI" /
-                "SwiftRNBO_Example_multiplatfrom_SwiftUI" / "RNBO" / "Export"
+                self.output / "SwiftRNBO_Example_multiplatfrom_SwiftUI" / "RNBO" / "Export"
             )
 
             if not output_rnbo_dir.exists():
@@ -165,8 +171,7 @@ class IOSReplacer:
 
             # Find project.pbxproj file
             project_file = (
-                self.output / "SwiftRNBO_Example_multiplatfrom_SwiftUI" /
-                "SwiftRNBO_Example_multiplatfrom_SwiftUI.xcodeproj" / "project.pbxproj"
+                self.output / "SwiftRNBO_Example_multiplatfrom_SwiftUI.xcodeproj" / "project.pbxproj"
             )
 
             if not project_file.exists():
@@ -225,7 +230,7 @@ class IOSReplacer:
         self.logger.section("✅ SUCCESS!")
         self.logger.success(f"Xcode project created: {self.output}")
         self.logger.info("\nNext steps:")
-        self.logger.info("1. cd " + str(self.output / "SwiftRNBO_Example_multiplatfrom_SwiftUI"))
+        self.logger.info("1. cd " + str(self.output))
         self.logger.info("2. open SwiftRNBO_Example_multiplatfrom_SwiftUI.xcodeproj")
         self.logger.info("3. Select device and press Cmd+R to build & run")
 
