@@ -92,7 +92,13 @@ class PresetManager: ObservableObject {
         rnbo: RNBOAudioUnitHostModel
     ) {
         if interpolationEnabled && !isInterpolating {
-            startInterpolation(preset: preset, parameters: parameters, rnbo: rnbo)
+            startInterpolation(
+                preset: preset,
+                parameters: parameters,
+                customRanges: &customRanges,
+                liveParameters: &liveParameters,
+                rnbo: rnbo
+            )
         } else {
             loadPresetInstant(preset, parameters: &parameters, customRanges: &customRanges, liveParameters: &liveParameters, rnbo: rnbo)
         }
@@ -124,10 +130,12 @@ class PresetManager: ObservableObject {
     // MARK: - Interpolation
 
     /// Start interpolation to preset values
-    /// Matches Android: startInterpolation()
+    /// Matches Android: startInterpolation() - Line 1749
     private func startInterpolation(
         preset: Preset,
         parameters: [RNBOParameter],
+        customRanges: inout [String: CustomRange],
+        liveParameters: inout Set<String>,
         rnbo: RNBOAudioUnitHostModel
     ) {
         // Capture start values and parameter indices
@@ -141,6 +149,12 @@ class PresetManager: ObservableObject {
 
         // Set target values
         interpolationTargetValues = preset.parameterValues
+
+        // Load preset configuration (ranges, live params) IMMEDIATELY
+        // Matches Android Lines 1768-1771
+        // This ensures UI shows new ranges while values interpolate
+        customRanges = preset.customRanges.mapValues { CustomRange(min: $0.customMin, max: $0.customMax, enabled: $0.enabled) }
+        liveParameters = preset.liveParameters
 
         // Start interpolation
         isInterpolating = true
