@@ -23,6 +23,9 @@ struct ParameterFilter {
             return filterForLiveMode(parameters, selectedIds: selectedIds)
         case .all:
             return filterForAllMode(parameters)
+        case .presets:
+            // Presets mode doesn't show parameter list (has its own UI)
+            return []
         case .setup:
             return filterForSetupMode(parameters)
         }
