@@ -52,6 +52,7 @@ class PresetManager: ObservableObject {
 
     /// Save current parameter state as a new preset
     /// Matches Android: saveCurrentAsPreset()
+    /// SAVES COMPLETE SETUP STATE: all parameter values, custom ranges, live selection, XY Pad mappings
     func saveCurrentAsPreset(
         name: String,
         parameters: [RNBOParameter],
@@ -59,14 +60,31 @@ class PresetManager: ObservableObject {
         liveParameters: Set<String>,
         xyPadMappings: [String: XYPadMapping]
     ) {
-        // Capture current parameter values
+        // Capture ALL parameter values (visible and hidden)
         var parameterValues: [String: Double] = [:]
         for param in parameters {
             parameterValues[param.id] = param.value
         }
 
-        // Deep copy custom ranges
-        let copiedRanges = customRanges.mapValues { CustomRange(min: $0.customMin, max: $0.customMax, enabled: $0.enabled) }
+        // Deep copy ALL custom ranges (ensure all parameters have a custom range entry)
+        var copiedRanges: [String: CustomRange] = [:]
+        for param in parameters {
+            if let existingRange = customRanges[param.id] {
+                // Copy existing custom range
+                copiedRanges[param.id] = CustomRange(
+                    min: existingRange.customMin,
+                    max: existingRange.customMax,
+                    enabled: existingRange.enabled
+                )
+            } else {
+                // Create disabled custom range with original parameter range
+                copiedRanges[param.id] = CustomRange(
+                    min: param.info.minimum,
+                    max: param.info.maximum,
+                    enabled: false
+                )
+            }
+        }
 
         // Deep copy XY Pad mappings
         let copiedMappings = xyPadMappings.mapValues { XYPadMapping(axis: $0.axis, invert: $0.invert) }
@@ -304,8 +322,12 @@ class PresetManager: ObservableObject {
     // MARK: - Persistence
 
     private func saveToStorage() {
-        storage.savePresets(savedPresets)
-        storage.saveInterpolationSettings(enabled: interpolationEnabled, timeMs: interpolationTimeMs)
+        // Defer to avoid "Publishing changes from within view updates" warning
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.storage.savePresets(self.savedPresets)
+            self.storage.saveInterpolationSettings(enabled: self.interpolationEnabled, timeMs: self.interpolationTimeMs)
+        }
     }
 
     private func loadConfiguration() {

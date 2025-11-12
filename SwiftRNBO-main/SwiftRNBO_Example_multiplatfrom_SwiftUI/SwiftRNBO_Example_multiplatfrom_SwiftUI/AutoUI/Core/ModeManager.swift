@@ -170,9 +170,13 @@ class ModeManager: ObservableObject {
     // MARK: - Persistence
 
     private func saveConfiguration() {
-        configStore.saveMode(currentMode)
-        configStore.saveSelectedParameters(selectedParameterIds)
-        configStore.saveCustomRanges(customRanges)
+        // Defer to avoid "Publishing changes from within view updates" warning
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.configStore.saveMode(self.currentMode)
+            self.configStore.saveSelectedParameters(self.selectedParameterIds)
+            self.configStore.saveCustomRanges(self.customRanges)
+        }
     }
 
     private func loadConfiguration() {
