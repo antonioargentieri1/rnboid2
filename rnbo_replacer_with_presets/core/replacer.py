@@ -14,12 +14,9 @@ from templates.buffer_loader_cpp import BufferLoaderCppTemplate
 from templates.nativelib import NativeLibTemplate
 from templates.build_gradle import BuildGradleTemplate
 from templates.androidmanifest import AndroidManifestTemplate
-from templates.mediapipe_setup import MediaPipeSetupTemplate
 from templates.cmakelists import CMakeListsTemplate
 from templates.themes import ThemesTemplate
 from templates.colors import ColorsTemplate
-from templates.gesturemanager import GestureManagerTemplate
-from templates.handoverlayview import HandOverlayViewTemplate
 
 
 
@@ -145,34 +142,22 @@ class RNBOReplacer:
             
             # Step 7: Genera MainActivity
             self._generate_mainactivity()
-            
-            # Step 8: Genera GestureManager
-            self._generate_gesturemanager()
-            
-            # Step 8b: Genera HandOverlayView
-            self._generate_handoverlayview()
-            
-            # Step 9: Genera activity_main.xml
+
+            # Step 8: Genera activity_main.xml
             self._generate_layout()
-            
-            # Step 9: Genera build.gradle con MediaPipe
+
+            # Step 9: Genera build.gradle
             self._generate_build_gradle()
-            
-            # Step 10: Genera AndroidManifest con permissions
+
+            # Step 10: Genera AndroidManifest
             self._generate_android_manifest()
-            
+
             # Step 11: Genera CMakeLists.txt con Oboe
             self._generate_cmakelists()
-            
+
             # Step 12: Genera themes e colors
             self._generate_resources()
-            
-            # Step 13: Copia MediaPipe model in assets
-            self._copy_mediapipe_model()
-            
-            # Step 14: Istruzioni MediaPipe model
-            self._show_mediapipe_instructions()
-            
+
             self._log_completion()
             return True
             
@@ -192,6 +177,16 @@ class RNBOReplacer:
 
         shutil.copytree(self.cpp_dir, backup_dir)
         self.logger.log(f"  [OK] Backup creato: {backup_dir}")
+
+    def _backup_java(self, java_dir):
+        """Crea backup dei file Java"""
+        backup_dir = self.template / "app" / "src" / "main" / "java_backup"
+
+        if backup_dir.exists():
+            shutil.rmtree(backup_dir)
+
+        shutil.copytree(java_dir, backup_dir / java_dir.name)
+        self.logger.log(f"  [OK] Backup Java creato: {backup_dir}")
 
     def _replace_cpp_files(self, rename_cpp):
         """Sostituisce i file .cpp dell'export"""
@@ -374,43 +369,9 @@ class RNBOReplacer:
 
         self.logger.log("  [OK] MainActivity.java aggiornato")
 
-    def _generate_gesturemanager(self):
-        """Genera GestureManager.java"""
-        self.logger.log("\n[GENERATE] Step 8: Generazione GestureManager.java...")
-
-        # Get package name and directory
-        package_name = self.analyzer.find_package_name(self.java_dir)
-        main_activity_dir = self.analyzer.find_mainactivity_dir(self.java_dir, package_name)
-
-        # Generate GestureManager
-        content = GestureManagerTemplate.get_content(package_name)
-
-        gesture_file = main_activity_dir / "GestureManager.java"
-        with open(gesture_file, 'w', encoding='utf-8') as f:
-            f.write(content)
-
-        self.logger.log("  [OK] GestureManager.java creato")
-
-    def _generate_handoverlayview(self):
-        """Genera HandOverlayView.java"""
-        self.logger.log("\n[GENERATE] Step 8b: Generazione HandOverlayView.java...")
-
-        # Get package name and directory
-        package_name = self.analyzer.find_package_name(self.java_dir)
-        main_activity_dir = self.analyzer.find_mainactivity_dir(self.java_dir, package_name)
-
-        # Generate HandOverlayView
-        content = HandOverlayViewTemplate.get_content(package_name)
-
-        overlay_file = main_activity_dir / "HandOverlayView.java"
-        with open(overlay_file, 'w', encoding='utf-8') as f:
-            f.write(content)
-
-        self.logger.log("  [OK] HandOverlayView.java creato")
-
     def _generate_layout(self):
         """Genera activity_main.xml"""
-        self.logger.log("\n[GENERATE] Step 9: Generazione activity_main.xml...")
+        self.logger.log("\n[GENERATE] Step 8: Generazione activity_main.xml...")
 
         # Backup
         xml_file = self.res_dir / "activity_main.xml"
@@ -428,21 +389,10 @@ class RNBOReplacer:
             f.write(content)
 
         self.logger.log("  [OK] activity_main.xml aggiornato")
-    
-    def _backup_java(self, main_activity_dir):
-        """Crea backup del file MainActivity.java"""
-        backup_dir = main_activity_dir.parent / "java_backup"
-        backup_dir.mkdir(parents=True, exist_ok=True)
-
-        original_file = main_activity_dir / "MainActivity.java"
-        if original_file.exists():
-            backup_file = backup_dir / "MainActivity.java.backup"
-            shutil.copy2(original_file, backup_file)
-            self.logger.log(f"  [BACKUP] Backup Java: java_backup/MainActivity.java.backup")
 
     def _generate_build_gradle(self):
-        """Genera build.gradle con dipendenze MediaPipe"""
-        self.logger.log("\n[GENERATE] Step 10: Generazione build.gradle con MediaPipe...")
+        """Genera build.gradle"""
+        self.logger.log("\n[GENERATE] Step 9: Generazione build.gradle...")
 
         gradle_file = self.template / "app" / "build.gradle"
 
@@ -460,11 +410,11 @@ class RNBOReplacer:
         with open(gradle_file, 'w', encoding='utf-8') as f:
             f.write(content)
 
-        self.logger.log("  [OK] build.gradle aggiornato con MediaPipe dependencies")
+        self.logger.log("  [OK] build.gradle aggiornato")
 
     def _generate_android_manifest(self):
-        """Genera AndroidManifest.xml con permissions camera"""
-        self.logger.log("\n[GENERATE] Step 11: Generazione AndroidManifest.xml...")
+        """Genera AndroidManifest.xml"""
+        self.logger.log("\n[GENERATE] Step 10: Generazione AndroidManifest.xml...")
 
         manifest_file = self.template / "app" / "src" / "main" / "AndroidManifest.xml"
 
@@ -482,11 +432,11 @@ class RNBOReplacer:
         with open(manifest_file, 'w', encoding='utf-8') as f:
             f.write(content)
 
-        self.logger.log("  [OK] AndroidManifest.xml aggiornato con camera permissions")
+        self.logger.log("  [OK] AndroidManifest.xml aggiornato")
 
     def _generate_cmakelists(self):
         """Genera CMakeLists.txt con Oboe configurato"""
-        self.logger.log("\n[GENERATE] Step 12: Generazione CMakeLists.txt...")
+        self.logger.log("\n[GENERATE] Step 11: Generazione CMakeLists.txt...")
 
         cmake_file = self.cpp_dir / "CMakeLists.txt"
 
@@ -508,7 +458,7 @@ class RNBOReplacer:
 
     def _generate_resources(self):
         """Genera themes.xml e colors.xml"""
-        self.logger.log("\n[GENERATE] Step 13: Generazione resources (themes & colors)...")
+        self.logger.log("\n[GENERATE] Step 12: Generazione resources (themes & colors)...")
 
         values_dir = self.template / "app" / "src" / "main" / "res" / "values"
         values_dir.mkdir(parents=True, exist_ok=True)
@@ -536,58 +486,7 @@ class RNBOReplacer:
             f.write(ColorsTemplate.get_content())
 
         self.logger.log("  [OK] colors.xml")
-    
-    def _copy_mediapipe_model(self):
-        """Copia automaticamente hand_landmarker.task in assets"""
-        self.logger.log("\n[MEDIAPIPE] Step 13: Copia MediaPipe Hand Landmarker Model...")
 
-        # Path del model nel progetto
-        models_dir = Path(__file__).parent.parent / "models"
-        model_file = models_dir / "hand_landmarker.task"
-
-        # Destination in assets
-        dest_file = self.assets_dir / "hand_landmarker.task"
-
-        if not model_file.exists():
-            self.logger.log("  [WARN] ATTENZIONE: hand_landmarker.task non trovato nel progetto!")
-            self.logger.log("  [INFO] Devi scaricarlo manualmente (vedi istruzioni sotto)")
-            return
-
-        try:
-            # Copia il model
-            shutil.copy2(model_file, dest_file)
-            file_size = dest_file.stat().st_size / (1024 * 1024)  # MB
-            self.logger.log(f"  [OK] hand_landmarker.task copiato in assets/ ({file_size:.1f} MB)")
-            self.logger.log("  [OK] MediaPipe model pronto!")
-        except Exception as e:
-            self.logger.log(f"  [ERROR] Errore copia model: {str(e)}")
-            self.logger.log("  [INFO] Dovrai scaricarlo manualmente")
-
-    def _show_mediapipe_instructions(self):
-        """Mostra istruzioni per MediaPipe model setup"""
-        self.logger.log("\n[MEDIAPIPE] Step 14: Setup MediaPipe Hand Landmarker Model...")
-
-        # Check if model was copied
-        dest_file = self.assets_dir / "hand_landmarker.task"
-        if dest_file.exists():
-            self.logger.log("  [OK] Model gia copiato automaticamente!")
-            self.logger.log("  [OK] Nessuna azione richiesta!")
-        else:
-            self.logger.log("\n[ACTION] AZIONE RICHIESTA:")
-            self.logger.log("  1. Scarica hand_landmarker.task da:")
-            self.logger.log("     https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task")
-            self.logger.log("  2. Posiziona in: app/src/main/assets/hand_landmarker.task")
-            self.logger.log("  3. Dimensione file: ~9 MB")
-
-        # Salva istruzioni in file (per riferimento)
-        instructions_file = self.template / "MEDIAPIPE_SETUP.txt"
-        instructions = MediaPipeSetupTemplate.get_instructions()
-
-        with open(instructions_file, 'w', encoding='utf-8') as f:
-            f.write(instructions)
-
-        self.logger.log(f"\n  [FILE] Istruzioni salvate in: MEDIAPIPE_SETUP.txt")
-    
     def _log_completion(self):
         """Log di completamento"""
         self.logger.log("\n" + "=" * 80)
@@ -600,36 +499,15 @@ class RNBOReplacer:
         self.logger.log(f"  - Backup manifest: manifest_backup/")
         self.logger.log("  - File C++ sostituiti")
         self.logger.log("  - description.json in assets/")
-        self.logger.log("  - hand_landmarker.task in assets/ (AUTOMATICO!)")
         self.logger.log("  - MSPLoader ottimizzato applicato")
-        self.logger.log("  - MainActivity con GestureManager integration (STEP 4)")
-        self.logger.log("  - HandOverlayView.java - Visualizzazione landmarks (STEP 5+)")
-        self.logger.log("  - activity_main.xml con camera preview + overlay (STEP 5)")
-        self.logger.log("  - GestureManager.java con CameraX (STEP 3)")
-        self.logger.log("  - build.gradle con MediaPipe + CameraX dependencies")
-        self.logger.log("  - AndroidManifest con camera permissions")
+        self.logger.log("  - MainActivity generato")
+        self.logger.log("  - activity_main.xml generato")
+        self.logger.log("  - build.gradle aggiornato")
+        self.logger.log("  - AndroidManifest aggiornato")
         self.logger.log("  - CMakeLists.txt con Oboe configurato")
-        self.logger.log("\n[FEATURES] STEP 4 Features:")
-        self.logger.log("  - GestureManager inizializzato in MainActivity")
-        self.logger.log("  - Lifecycle hooks (onCreate, onResume, onPause, onDestroy)")
-        self.logger.log("  - Camera permission handling automatico")
-        self.logger.log("  - Callback per hand detection con logging")
-        self.logger.log("  - handleHandDetection() con 21 landmarks log")
-        self.logger.log("\n[FEATURES] STEP 5 Features:")
-        self.logger.log("  - Camera preview (200x200) in basso a sinistra")
-        self.logger.log("  - HandOverlayView - 21 landmarks visualizzati in tempo reale")
-        self.logger.log("  - Linee di connessione tra le dita")
-        self.logger.log("  - Wrist (polso) evidenziato in verde")
-        self.logger.log("  - Toggle button '[Camera]' in alto a destra")
-        self.logger.log("  - Visibility control on/off")
-        self.logger.log("\n[MEDIAPIPE] MediaPipe Model:")
-        self.logger.log("  - [OK] hand_landmarker.task copiato AUTOMATICAMENTE!")
-        self.logger.log("  - [OK] Nessun download manuale necessario!")
         self.logger.log("\n[BUILD] Compila ora:")
         self.logger.log("   gradlew clean")
         self.logger.log("   gradlew build")
         self.logger.log("\n[TEST] Test:")
-        self.logger.log("   1. Run app su device reale")
-        self.logger.log("   2. Grant camera permission")
-        self.logger.log("   3. Mostra la mano alla camera")
-        self.logger.log("   4. Verifica logcat: '[HAND] Hand detected! 21 landmarks'")
+        self.logger.log("   1. Run app su device")
+        self.logger.log("   2. Verifica parametri RNBO funzionanti")

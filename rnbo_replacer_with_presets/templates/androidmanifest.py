@@ -1,5 +1,5 @@
 """
-AndroidManifest.xml Template - Camera Permissions
+AndroidManifest.xml Template
 """
 
 
@@ -9,10 +9,6 @@ class AndroidManifestTemplate:
         return '''<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
-    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
     <application
         android:allowBackup="true"
