@@ -94,7 +94,7 @@ struct AutoSlider: View {
 
                 // Current value
                 if showCurrentValue {
-                    CurrentValueLabel(value: parameter.value, unit: parameter.info.unit)
+                    CurrentValueLabel(value: displayValue, unit: parameter.info.unit)
                         .frame(minWidth: 70, alignment: .leading)
                 }
             }
@@ -118,6 +118,13 @@ struct AutoSlider: View {
 
     private var effectiveRange: (min: Double, max: Double) {
         modeManager.getEffectiveRange(for: parameter)
+    }
+
+    private var displayValue: Double {
+        // Clamp value to custom range if enabled
+        let value = parameter.value
+        let range = effectiveRange
+        return max(range.min, min(range.max, value))
     }
 }
 
