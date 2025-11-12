@@ -122,6 +122,7 @@ struct QuickPresetsView: View {
             parameters: &parameters,
             customRanges: &modeManager.customRanges,
             liveParameters: &modeManager.selectedParameterIds,
+            xyPadManager: xyPadManager,
             rnbo: rnbo
         )
     }

@@ -15,6 +15,7 @@ struct PresetsManagerView: View {
     @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
     @EnvironmentObject var modeManager: ModeManager
     @EnvironmentObject var presetManager: PresetManager
+    @EnvironmentObject var xyPadManager: XYPadManager
 
     @Binding var parameters: [RNBOParameter]
 
@@ -182,7 +183,8 @@ struct PresetsManagerView: View {
             name: newPresetName,
             parameters: parameters,
             customRanges: modeManager.customRanges,
-            liveParameters: modeManager.selectedParameterIds
+            liveParameters: modeManager.selectedParameterIds,
+            xyPadMappings: xyPadManager.mappings
         )
 
         newPresetName = ""
@@ -194,6 +196,7 @@ struct PresetsManagerView: View {
             parameters: &parameters,
             customRanges: &modeManager.customRanges,
             liveParameters: &modeManager.selectedParameterIds,
+            xyPadManager: xyPadManager,
             rnbo: rnbo
         )
 

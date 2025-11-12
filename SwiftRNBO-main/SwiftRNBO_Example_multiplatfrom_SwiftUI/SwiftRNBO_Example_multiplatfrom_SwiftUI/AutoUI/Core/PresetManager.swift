@@ -94,6 +94,7 @@ class PresetManager: ObservableObject {
         parameters: inout [RNBOParameter],
         customRanges: inout [String: CustomRange],
         liveParameters: inout Set<String>,
+        xyPadManager: XYPadManager,
         rnbo: RNBOAudioUnitHostModel
     ) {
         if interpolationEnabled && !isInterpolating {
@@ -102,10 +103,11 @@ class PresetManager: ObservableObject {
                 parameters: parameters,
                 customRanges: &customRanges,
                 liveParameters: &liveParameters,
+                xyPadManager: xyPadManager,
                 rnbo: rnbo
             )
         } else {
-            loadPresetInstant(preset, parameters: &parameters, customRanges: &customRanges, liveParameters: &liveParameters, rnbo: rnbo)
+            loadPresetInstant(preset, parameters: &parameters, customRanges: &customRanges, liveParameters: &liveParameters, xyPadManager: xyPadManager, rnbo: rnbo)
         }
     }
 
@@ -115,6 +117,7 @@ class PresetManager: ObservableObject {
         parameters: inout [RNBOParameter],
         customRanges: inout [String: CustomRange],
         liveParameters: inout Set<String>,
+        xyPadManager: XYPadManager,
         rnbo: RNBOAudioUnitHostModel
     ) {
         // Apply custom ranges
@@ -122,6 +125,9 @@ class PresetManager: ObservableObject {
 
         // Apply live parameters selection
         liveParameters = preset.liveParameters
+
+        // Apply XY Pad mappings
+        xyPadManager.loadMappings(preset.xyPadMappings)
 
         // Apply parameter values
         for (paramId, value) in preset.parameterValues {
@@ -141,6 +147,7 @@ class PresetManager: ObservableObject {
         parameters: [RNBOParameter],
         customRanges: inout [String: CustomRange],
         liveParameters: inout Set<String>,
+        xyPadManager: XYPadManager,
         rnbo: RNBOAudioUnitHostModel
     ) {
         // Capture start values and parameter indices
@@ -155,11 +162,12 @@ class PresetManager: ObservableObject {
         // Set target values
         interpolationTargetValues = preset.parameterValues
 
-        // Load preset configuration (ranges, live params) IMMEDIATELY
+        // Load preset configuration (ranges, live params, XY Pad) IMMEDIATELY
         // Matches Android Lines 1768-1771
         // This ensures UI shows new ranges while values interpolate
         customRanges = preset.customRanges.mapValues { CustomRange(min: $0.customMin, max: $0.customMax, enabled: $0.enabled) }
         liveParameters = preset.liveParameters
+        xyPadManager.loadMappings(preset.xyPadMappings)
 
         // Start interpolation
         isInterpolating = true
