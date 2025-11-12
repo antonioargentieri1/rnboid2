@@ -1,8 +1,13 @@
 # Custom Range System - Comandi per Aggiornare e Testare
 
-## ✅ Implementazione Completata!
+## ✅ Implementazione Completata + FIX MAPPING!
 
 Il sistema Custom Range è stato implementato con successo, simile a quello Android RNBOID2.
+
+**ULTIMA MODIFICA (commit e9dc763):**
+- ✅ **FIXED:** Slider ora mappa correttamente sul custom range
+- ✅ **LOGICA CORRETTA:** Come Android - slider 0-1 → custom range → RNBO
+- ✅ **ESEMPIO:** Range custom 200-2000 Hz, slider a 50% → 1100 Hz (NON 10000 Hz!)
 
 ---
 
@@ -114,6 +119,16 @@ Premi **Cmd+R** ▶️
    - Max label: `2000.00 Hz` (invece di 20000.00)
 4. **Muovi slider** → Controlla solo range 200-2000!
 
+### Test 3b: VERIFICA MAPPING CORRETTO (IMPORTANTE!)
+
+1. **Imposta custom range 200-2000 Hz** su frequency_1
+2. **Click "All"**
+3. **Muovi slider a METÀ** (circa centro)
+4. **Number box dovrebbe mostrare ~1100 Hz** (NON 10000 Hz!)
+5. **Muovi slider tutto a sinistra** → ~200 Hz
+6. **Muovi slider tutto a destra** → ~2000 Hz
+7. ✅ Se i valori corrispondono, il mapping funziona!
+
 ### Test 4: Persistenza
 
 1. **Imposta custom range** per 2-3 parametri
@@ -211,9 +226,14 @@ git pull origin claude/swiftrnbo-autoui-setup-011CV2oURwyLUPLc1aKZaEfc
 |------|---------|-------------|
 | ModeManager.swift | Added CustomRange model + methods | +110 |
 | RangeSlider.swift | NEW - Dual-thumb slider | +185 |
-| AutoSlider.swift | Use effective ranges | +5 |
+| AutoSlider.swift | ✅ FIXED slider mapping to custom range | +30 |
 | ParameterRow.swift | Added custom range UI | +69 |
-| **TOTAL** | | **+369 lines** |
+| **TOTAL** | | **+394 lines** |
+
+**Ultimo fix (commit e9dc763):**
+- AutoSlider.swift: Implementato `sliderBinding` per mappare correttamente 0-1 → custom range
+- Rimosso binding sbagliato `$parameter.valueNormalized` (mappava su range originale)
+- Ora funziona esattamente come Android MainActivity.java SliderListener
 
 ---
 
@@ -243,7 +263,10 @@ Custom Range è implementato correttamente se:
 - ✅ Toggle appare in Setup mode
 - ✅ Range slider con 2 thumbs funziona
 - ✅ Range label si aggiorna live
-- ✅ Slider in All mode usa custom range
+- ✅ **Slider in All mode mappa correttamente su custom range**
+  - ❗ **CRITICO:** Slider a 50% con range 200-2000 → ~1100 Hz (NON 10000!)
+  - ❗ Labels min/max mostrano custom range (200-2000)
+  - ❗ Number box mostra valore corretto nel custom range
 - ✅ Persistenza funziona (chiudi/riapri app)
 - ✅ Disabling toggle ripristina range originale
 - ✅ Nessun crash o errore di compilazione
