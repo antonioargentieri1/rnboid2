@@ -322,12 +322,8 @@ class PresetManager: ObservableObject {
     // MARK: - Persistence
 
     private func saveToStorage() {
-        // Defer to avoid "Publishing changes from within view updates" warning
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.storage.savePresets(self.savedPresets)
-            self.storage.saveInterpolationSettings(enabled: self.interpolationEnabled, timeMs: self.interpolationTimeMs)
-        }
+        storage.savePresets(savedPresets)
+        storage.saveInterpolationSettings(enabled: interpolationEnabled, timeMs: interpolationTimeMs)
     }
 
     private func loadConfiguration() {
