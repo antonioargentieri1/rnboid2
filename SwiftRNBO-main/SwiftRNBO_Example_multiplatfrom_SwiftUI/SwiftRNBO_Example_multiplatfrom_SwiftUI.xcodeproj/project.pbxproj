@@ -16,8 +16,6 @@
 		AFEBC8E42B079C150097D64B /* AudioKitKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFEBC8E32B079C150097D64B /* AudioKitKeyboard.swift */; };
 		AFF2B41E29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */; };
 		AFF2B42029A2090200068DD0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B41F29A2090200068DD0 /* ContentView.swift */; };
-				9E36CD31709FF39A3E271A5B /* AutoUI */,
-
 		AFF2B42229A2090300068DD0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AFF2B42129A2090300068DD0 /* Assets.xcassets */; };
 		AFF2B42629A2090300068DD0 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AFF2B42529A2090300068DD0 /* Preview Assets.xcassets */; };
 		AFF2B4EB29A2094600068DD0 /* RNBOAudioEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B43229A2093F00068DD0 /* RNBOAudioEngine.swift */; };
@@ -35,18 +33,6 @@
 		AFFCBE422B09019A00800A23 /* RNBODescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFFCBE412B09019A00800A23 /* RNBODescription.swift */; };
 		AFFCBE442B09079000800A23 /* DescriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFFCBE432B09079000800A23 /* DescriptionView.swift */; };
 		AFFCBE462B09575300800A23 /* SliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFFCBE452B09575300800A23 /* SliderView.swift */; };
-				328E28D2066427BCDDAEF0A3 /* ModeManager.swift in Sources */,
-				58F3CA98CAA16991497F896E /* ParameterFilter.swift in Sources */,
-				E124DB5F058F60AEC3917D5C /* AutoUIView.swift in Sources */,
-				4D291E06603585D605651DF0 /* AutoSlider.swift in Sources */,
-				80CBAEFB29FAF24E54463F58 /* ParameterRow.swift in Sources */,
-
-		328E28D2066427BCDDAEF0A3 /* ModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD34B44D69F197A53101C8DE /* ModeManager.swift */; };
-		58F3CA98CAA16991497F896E /* ParameterFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96FBB8875CC502011A27E39B /* ParameterFilter.swift */; };
-		E124DB5F058F60AEC3917D5C /* AutoUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D6A5C9FAFD75433CE5D7E8 /* AutoUIView.swift */; };
-		4D291E06603585D605651DF0 /* AutoSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0A2DF17124D5D534F71C73 /* AutoSlider.swift */; };
-		80CBAEFB29FAF24E54463F58 /* ParameterRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FDFE46EBF108205F6A2DC6F /* ParameterRow.swift */; };
-
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,8 +49,6 @@
 		AFF2B41A29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftRNBO_Example_multiplatfrom_SwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift; sourceTree = "<group>"; };
 		AFF2B41F29A2090200068DD0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-				9E36CD31709FF39A3E271A5B /* AutoUI */,
-
 		AFF2B42129A2090300068DD0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AFF2B42329A2090300068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SwiftRNBO_Example_multiplatfrom_SwiftUI.entitlements; sourceTree = "<group>"; };
 		AFF2B42529A2090300068DD0 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -236,12 +220,6 @@
 		AFFCBE412B09019A00800A23 /* RNBODescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNBODescription.swift; sourceTree = "<group>"; };
 		AFFCBE432B09079000800A23 /* DescriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionView.swift; sourceTree = "<group>"; };
 		AFFCBE452B09575300800A23 /* SliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderView.swift; sourceTree = "<group>"; };
-		BD34B44D69F197A53101C8DE /* ModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeManager.swift; sourceTree = "<group>"; };
-		96FBB8875CC502011A27E39B /* ParameterFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParameterFilter.swift; sourceTree = "<group>"; };
-		27D6A5C9FAFD75433CE5D7E8 /* AutoUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoUIView.swift; sourceTree = "<group>"; };
-		8A0A2DF17124D5D534F71C73 /* AutoSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoSlider.swift; sourceTree = "<group>"; };
-		3FDFE46EBF108205F6A2DC6F /* ParameterRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParameterRow.swift; sourceTree = "<group>"; };
-
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -279,8 +257,6 @@
 				AFF2B42E29A2093F00068DD0 /* RNBO */,
 				AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */,
 				AFF2B41F29A2090200068DD0 /* ContentView.swift */,
-				9E36CD31709FF39A3E271A5B /* AutoUI */,
-
 				AFFCBE432B09079000800A23 /* DescriptionView.swift */,
 				AFF2B4F729A20A3500068DD0 /* Sliders.swift */,
 				AFFCBE452B09575300800A23 /* SliderView.swift */,
@@ -680,35 +656,6 @@
 			path = MPark_variant;
 			sourceTree = "<group>";
 		};
-		9E36CD31709FF39A3E271A5B /* AutoUI */ = {
-			isa = PBXGroup;
-			children = (
-				AA2E33B7B1E0E4BE21E91157 /* Core */,
-				2023A2DECC48B4A32B6647AE /* Widgets */,
-			);
-			path = AutoUI;
-			sourceTree = "<group>";
-		};
-		AA2E33B7B1E0E4BE21E91157 /* Core */ = {
-			isa = PBXGroup;
-			children = (
-				BD34B44D69F197A53101C8DE /* ModeManager.swift */,
-				96FBB8875CC502011A27E39B /* ParameterFilter.swift */,
-				27D6A5C9FAFD75433CE5D7E8 /* AutoUIView.swift */,
-			);
-			path = Core;
-			sourceTree = "<group>";
-		};
-		2023A2DECC48B4A32B6647AE /* Widgets */ = {
-			isa = PBXGroup;
-			children = (
-				8A0A2DF17124D5D534F71C73 /* AutoSlider.swift */,
-				3FDFE46EBF108205F6A2DC6F /* ParameterRow.swift */,
-			);
-			path = Widgets;
-			sourceTree = "<group>";
-		};
-
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -799,20 +746,12 @@
 				AF4B40932B06326800FAACBF /* RNBOEventHandler.swift in Sources */,
 				AFEBC8E42B079C150097D64B /* AudioKitKeyboard.swift in Sources */,
 				AFFCBE462B09575300800A23 /* SliderView.swift in Sources */,
-				328E28D2066427BCDDAEF0A3 /* ModeManager.swift in Sources */,
-				58F3CA98CAA16991497F896E /* ParameterFilter.swift in Sources */,
-				E124DB5F058F60AEC3917D5C /* AutoUIView.swift in Sources */,
-				4D291E06603585D605651DF0 /* AutoSlider.swift in Sources */,
-				80CBAEFB29FAF24E54463F58 /* ParameterRow.swift in Sources */,
-
 				AFF2B4F329A2095300068DD0 /* RNBO.cpp in Sources */,
 				AFF2B4EE29A2094900068DD0 /* RNBOAudioUnit.mm in Sources */,
 				AFF2B4EC29A2094600068DD0 /* RNBOParameter.swift in Sources */,
 				AF4B40912B061DDD00FAACBF /* RNBOList.mm in Sources */,
 				AFFCBE422B09019A00800A23 /* RNBODescription.swift in Sources */,
 				AFF2B42029A2090200068DD0 /* ContentView.swift in Sources */,
-				9E36CD31709FF39A3E271A5B /* AutoUI */,
-
 				AFF2B4EB29A2094600068DD0 /* RNBOAudioEngine.swift in Sources */,
 				AFF2B41E29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift in Sources */,
 				AFFCBE442B09079000800A23 /* DescriptionView.swift in Sources */,
