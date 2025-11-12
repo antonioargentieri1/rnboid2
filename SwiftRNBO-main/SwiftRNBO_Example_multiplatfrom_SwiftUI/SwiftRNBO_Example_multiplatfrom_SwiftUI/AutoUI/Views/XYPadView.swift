@@ -122,10 +122,19 @@ struct XYPadView: View {
     // MARK: - Cursor View
 
     private var cursorView: some View {
-        Circle()
-            .stroke(Color.white, lineWidth: xyPadManager.isTouching ? 0 : 2) // Stroke when not touching
-            .fill(xyPadManager.isTouching ? Color.white : Color.clear) // Fill when touching
-            .frame(width: 30, height: 30)
+        Group {
+            if xyPadManager.isTouching {
+                // Filled circle when touching
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 30, height: 30)
+            } else {
+                // Stroked circle when not touching
+                Circle()
+                    .strokeBorder(Color.white, lineWidth: 2)
+                    .frame(width: 30, height: 30)
+            }
+        }
     }
 
     // MARK: - Labels View
