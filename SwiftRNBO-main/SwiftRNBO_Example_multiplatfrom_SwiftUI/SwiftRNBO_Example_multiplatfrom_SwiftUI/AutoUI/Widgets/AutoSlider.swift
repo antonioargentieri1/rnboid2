@@ -34,29 +34,58 @@ struct AutoSlider: View {
                 }
 
                 // Slider
-                Slider(
-                    value: $parameter.valueNormalized,
-                    in: 0...1,
-                    step: stepSize
-                ) {
-                    Text(displayName)
-                } minimumValueLabel: {
-                    if !showMinMaxLabels {
-                        ValueLabel(value: parameter.info.minimum, unit: parameter.info.unit)
+                Group {
+                    if let step = stepSize {
+                        Slider(
+                            value: $parameter.valueNormalized,
+                            in: 0...1,
+                            step: step
+                        ) {
+                            Text(displayName)
+                        } minimumValueLabel: {
+                            if !showMinMaxLabels {
+                                ValueLabel(value: parameter.info.minimum, unit: parameter.info.unit)
+                            } else {
+                                EmptyView()
+                            }
+                        } maximumValueLabel: {
+                            if !showMinMaxLabels {
+                                ValueLabel(value: parameter.info.maximum, unit: parameter.info.unit)
+                            } else {
+                                EmptyView()
+                            }
+                        }
+                        .accentColor(accentColor)
+                        .onChange(of: parameter.valueNormalized) { newValue in
+                            if let unwrappedValue = newValue {
+                                rnbo.setParameterValueNormalized(to: unwrappedValue, at: parameter.info.index)
+                            }
+                        }
                     } else {
-                        EmptyView()
-                    }
-                } maximumValueLabel: {
-                    if !showMinMaxLabels {
-                        ValueLabel(value: parameter.info.maximum, unit: parameter.info.unit)
-                    } else {
-                        EmptyView()
-                    }
-                }
-                .accentColor(accentColor)
-                .onChange(of: parameter.valueNormalized) { newValue in
-                    if let unwrappedValue = newValue {
-                        rnbo.setParameterValueNormalized(to: unwrappedValue, at: parameter.info.index)
+                        Slider(
+                            value: $parameter.valueNormalized,
+                            in: 0...1
+                        ) {
+                            Text(displayName)
+                        } minimumValueLabel: {
+                            if !showMinMaxLabels {
+                                ValueLabel(value: parameter.info.minimum, unit: parameter.info.unit)
+                            } else {
+                                EmptyView()
+                            }
+                        } maximumValueLabel: {
+                            if !showMinMaxLabels {
+                                ValueLabel(value: parameter.info.maximum, unit: parameter.info.unit)
+                            } else {
+                                EmptyView()
+                            }
+                        }
+                        .accentColor(accentColor)
+                        .onChange(of: parameter.valueNormalized) { newValue in
+                            if let unwrappedValue = newValue {
+                                rnbo.setParameterValueNormalized(to: unwrappedValue, at: parameter.info.index)
+                            }
+                        }
                     }
                 }
 
