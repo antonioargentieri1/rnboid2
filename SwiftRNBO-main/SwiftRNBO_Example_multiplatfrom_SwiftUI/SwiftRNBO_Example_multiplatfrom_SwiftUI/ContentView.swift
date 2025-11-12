@@ -3,6 +3,7 @@
 //  SwiftRNBO_Example_multiplatfrom_SwiftUI
 //
 //  Created by Эльдар Садыков on 19.02.2023.
+//  Updated with AutoUI System
 //
 
 import SwiftUI
@@ -17,7 +18,8 @@ struct ContentView: View {
                 if rnbo.showDescription {
                     DescriptionView()
                 } else {
-                    Sliders()
+                    // AutoUI System - Auto-generated parameter UI
+                    AutoUIView()
                     AudioKitKeyboard()
                 }
             #endif
