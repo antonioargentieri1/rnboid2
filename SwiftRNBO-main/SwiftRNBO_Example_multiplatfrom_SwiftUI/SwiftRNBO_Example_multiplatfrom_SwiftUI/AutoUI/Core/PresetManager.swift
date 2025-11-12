@@ -36,6 +36,7 @@ class PresetManager: ObservableObject {
     private var interpolationTimer: Timer?
     private var interpolationStartValues: [String: Double] = [:]
     private var interpolationTargetValues: [String: Double] = [:]
+    private var interpolationParamIndices: [String: Int] = [:] // paramId -> parameter array index
     private var interpolationStartTime: Date?
 
     // Storage
@@ -129,10 +130,13 @@ class PresetManager: ObservableObject {
         parameters: [RNBOParameter],
         rnbo: RNBOAudioUnitHostModel
     ) {
-        // Capture start values
+        // Capture start values and parameter indices
         interpolationStartValues.removeAll()
-        for param in parameters {
+        interpolationParamIndices.removeAll()
+
+        for (arrayIndex, param) in parameters.enumerated() {
             interpolationStartValues[param.id] = param.value
+            interpolationParamIndices[param.id] = arrayIndex
         }
 
         // Set target values
@@ -146,16 +150,13 @@ class PresetManager: ObservableObject {
         // Start timer (60fps = ~16ms interval)
         let interval = 1.0 / interpolationFps
         interpolationTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
-            self?.updateInterpolation(parameters: parameters, rnbo: rnbo)
+            self?.updateInterpolation(rnbo: rnbo)
         }
     }
 
     /// Update interpolation progress
     /// Matches Android: updateInterpolatedValues()
-    private func updateInterpolation(
-        parameters: [RNBOParameter],
-        rnbo: RNBOAudioUnitHostModel
-    ) {
+    private func updateInterpolation(rnbo: RNBOAudioUnitHostModel) {
         guard let startTime = interpolationStartTime else {
             finishInterpolation()
             return
@@ -169,34 +170,37 @@ class PresetManager: ObservableObject {
         if rawProgress >= 1.0 {
             // Interpolation complete
             interpolationProgress = 1.0
-            applyInterpolatedValues(progress: 1.0, parameters: parameters, rnbo: rnbo)
+            applyInterpolatedValues(progress: 1.0, rnbo: rnbo)
             finishInterpolation()
         } else {
             // Update with easing
             interpolationProgress = rawProgress
-            applyInterpolatedValues(progress: rawProgress, parameters: parameters, rnbo: rnbo)
+            applyInterpolatedValues(progress: rawProgress, rnbo: rnbo)
         }
     }
 
     /// Apply interpolated values with easing
     private func applyInterpolatedValues(
         progress: Double,
-        parameters: [RNBOParameter],
         rnbo: RNBOAudioUnitHostModel
     ) {
         let easedProgress = easeInOutQuad(progress)
 
-        for param in parameters {
-            guard let startValue = interpolationStartValues[param.id],
-                  let targetValue = interpolationTargetValues[param.id] else {
+        for (paramId, startValue) in interpolationStartValues {
+            guard let targetValue = interpolationTargetValues[paramId],
+                  let arrayIndex = interpolationParamIndices[paramId] else {
                 continue
             }
 
             // Linear interpolation with easing
             let interpolatedValue = startValue + (targetValue - startValue) * easedProgress
 
-            // Update RNBO
-            rnbo.setParameterValue(to: interpolatedValue, at: param.info.index)
+            // Update RNBO engine
+            let paramIndex = rnbo.parameters[arrayIndex].info.index
+            rnbo.setParameterValue(to: interpolatedValue, at: paramIndex)
+
+            // Update @Published parameters array for UI update
+            rnbo.parameters[arrayIndex].value = interpolatedValue
         }
     }
 
@@ -209,6 +213,7 @@ class PresetManager: ObservableObject {
         interpolationStartTime = nil
         interpolationStartValues.removeAll()
         interpolationTargetValues.removeAll()
+        interpolationParamIndices.removeAll()
     }
 
     /// Quadratic easing function (matches Android)
