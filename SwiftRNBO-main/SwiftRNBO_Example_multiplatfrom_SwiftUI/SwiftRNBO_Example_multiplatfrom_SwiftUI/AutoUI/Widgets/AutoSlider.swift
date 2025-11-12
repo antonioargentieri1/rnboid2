@@ -57,9 +57,7 @@ struct AutoSlider: View {
                         }
                         .accentColor(accentColor)
                         .onChange(of: parameter.valueNormalized) { newValue in
-                            if let unwrappedValue = newValue {
-                                rnbo.setParameterValueNormalized(to: unwrappedValue, at: parameter.info.index)
-                            }
+                            rnbo.setParameterValueNormalized(to: newValue, at: parameter.info.index)
                         }
                     } else {
                         Slider(
@@ -82,9 +80,7 @@ struct AutoSlider: View {
                         }
                         .accentColor(accentColor)
                         .onChange(of: parameter.valueNormalized) { newValue in
-                            if let unwrappedValue = newValue {
-                                rnbo.setParameterValueNormalized(to: unwrappedValue, at: parameter.info.index)
-                            }
+                            rnbo.setParameterValueNormalized(to: newValue, at: parameter.info.index)
                         }
                     }
                 }
