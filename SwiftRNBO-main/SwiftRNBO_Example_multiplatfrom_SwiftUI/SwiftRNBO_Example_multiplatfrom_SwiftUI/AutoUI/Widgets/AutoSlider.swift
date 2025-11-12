@@ -55,7 +55,9 @@ struct AutoSlider: View {
                 }
                 .accentColor(accentColor)
                 .onChange(of: parameter.valueNormalized) { newValue in
-                    rnbo.setParameterValueNormalized(to: newValue, at: parameter.info.index)
+                    if let unwrappedValue = newValue {
+                        rnbo.setParameterValueNormalized(to: unwrappedValue, at: parameter.info.index)
+                    }
                 }
 
                 // Max label
