@@ -1,0 +1,13 @@
+./EXAMPLE.md
+./QUICKSTART.md
+./README.md
+./STRUCTURE.txt
+./__init__.py
+./core/__init__.py
+./core/analyzer.py
+./core/replacer.py
+./main.py
+./requirements.txt
+./test_imports.py
+./utils/__init__.py
+./utils/logger.py

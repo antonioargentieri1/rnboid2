@@ -1,0 +1,4 @@
+# RNBO Replacer iOS/macOS Requirements
+# Python 3.8+ required
+
+# No external dependencies required - uses only Python standard library
