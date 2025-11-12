@@ -55,9 +55,13 @@ class IOSReplacer:
                 "Core/ModeManager.swift",
                 "Core/ParameterFilter.swift",
                 "Core/AutoUIView.swift",
+                "Core/Preset.swift",
+                "Core/PresetManager.swift",
                 "Widgets/AutoSlider.swift",
                 "Widgets/ParameterRow.swift",
-                "Widgets/RangeSlider.swift"
+                "Widgets/RangeSlider.swift",
+                "Views/PresetsManagerView.swift",
+                "Views/QuickPresetsView.swift"
             ]
             for file in autoui_files:
                 if (autoui_dir / file).exists():

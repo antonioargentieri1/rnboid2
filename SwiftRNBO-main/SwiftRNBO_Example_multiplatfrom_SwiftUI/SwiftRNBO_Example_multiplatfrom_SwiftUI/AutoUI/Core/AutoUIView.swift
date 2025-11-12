@@ -12,6 +12,7 @@ import SwiftUI
 struct AutoUIView: View {
     @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
     @StateObject var modeManager = ModeManager()
+    @StateObject var presetManager = PresetManager()
 
     @State private var sortOrder: ParameterSortOrder = .order
     @State private var searchQuery: String = ""
@@ -23,15 +24,25 @@ struct AutoUIView: View {
                 .padding(.horizontal)
                 .padding(.top, 8)
 
+            // Quick Presets (LIVE mode header)
+            if modeManager.currentMode == .live {
+                QuickPresetsView(parameters: $rnbo.parameters)
+            }
+
             // Setup mode controls
             if modeManager.currentMode == .setup {
                 setupModeControls
             }
 
-            // Parameters list
-            parametersList
+            // Content (Presets Manager or Parameters List)
+            if modeManager.currentMode == .presets {
+                PresetsManagerView(parameters: $rnbo.parameters)
+            } else {
+                parametersList
+            }
         }
         .environmentObject(modeManager)
+        .environmentObject(presetManager)
         .onAppear {
             initializeModeManager()
         }
@@ -145,6 +156,8 @@ struct AutoUIView: View {
             return "No parameters selected for Live mode"
         case .all:
             return "No visible parameters found"
+        case .presets:
+            return "No presets saved yet"
         case .setup:
             return "No visible parameters to configure"
         }

@@ -25,6 +25,7 @@ struct CustomRange: Codable {
 enum UIMode: String, CaseIterable, Identifiable {
     case live = "Live"
     case all = "All"
+    case presets = "Presets"
     case setup = "Setup"
 
     var id: String { rawValue }
@@ -35,6 +36,8 @@ enum UIMode: String, CaseIterable, Identifiable {
             return "Show only selected parameters for performance"
         case .all:
             return "Show all visible parameters"
+        case .presets:
+            return "Manage presets and morphing"
         case .setup:
             return "Configure Live mode parameters"
         }
@@ -46,6 +49,8 @@ enum UIMode: String, CaseIterable, Identifiable {
             return "play.circle.fill"
         case .all:
             return "slider.horizontal.3"
+        case .presets:
+            return "square.stack.3d.up.fill"
         case .setup:
             return "gearshape.fill"
         }
