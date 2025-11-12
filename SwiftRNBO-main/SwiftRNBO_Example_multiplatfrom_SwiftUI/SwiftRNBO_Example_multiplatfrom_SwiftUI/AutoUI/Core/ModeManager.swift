@@ -8,6 +8,19 @@
 
 import SwiftUI
 
+/// Custom Range - Restricts parameter range to a subset
+struct CustomRange: Codable {
+    var enabled: Bool
+    var customMin: Double
+    var customMax: Double
+
+    init(min: Double, max: Double, enabled: Bool = false) {
+        self.customMin = min
+        self.customMax = max
+        self.enabled = enabled
+    }
+}
+
 /// UI Mode types
 enum UIMode: String, CaseIterable, Identifiable {
     case live = "Live"
@@ -46,6 +59,9 @@ class ModeManager: ObservableObject {
 
     // Selected parameters for Live mode (paramId set)
     @Published var selectedParameterIds: Set<String> = []
+
+    // Custom ranges per parameter (paramId -> CustomRange)
+    @Published var customRanges: [String: CustomRange] = [:]
 
     // Configuration store
     private let configStore = ConfigurationStore()
@@ -100,16 +116,64 @@ class ModeManager: ObservableObject {
         saveConfiguration()
     }
 
+    // MARK: - Custom Range Management
+
+    /// Get effective range for a parameter (custom if enabled, original otherwise)
+    func getEffectiveRange(for parameter: RNBOParameter) -> (min: Double, max: Double) {
+        if let customRange = customRanges[parameter.id], customRange.enabled {
+            return (customRange.customMin, customRange.customMax)
+        }
+        return (parameter.info.minimum, parameter.info.maximum)
+    }
+
+    /// Set custom range for a parameter
+    func setCustomRange(_ paramId: String, min: Double, max: Double, enabled: Bool) {
+        customRanges[paramId] = CustomRange(min: min, max: max, enabled: enabled)
+        saveConfiguration()
+    }
+
+    /// Toggle custom range enabled/disabled
+    func toggleCustomRange(_ paramId: String) {
+        if var range = customRanges[paramId] {
+            range.enabled.toggle()
+            customRanges[paramId] = range
+            saveConfiguration()
+        }
+    }
+
+    /// Update custom range values
+    func updateCustomRange(_ paramId: String, min: Double, max: Double) {
+        if var range = customRanges[paramId] {
+            range.customMin = min
+            range.customMax = max
+            customRanges[paramId] = range
+            saveConfiguration()
+        }
+    }
+
+    /// Initialize custom range for a parameter if not exists
+    func ensureCustomRange(for parameter: RNBOParameter) {
+        if customRanges[parameter.id] == nil {
+            customRanges[parameter.id] = CustomRange(
+                min: parameter.info.minimum,
+                max: parameter.info.maximum,
+                enabled: false
+            )
+        }
+    }
+
     // MARK: - Persistence
 
     private func saveConfiguration() {
         configStore.saveMode(currentMode)
         configStore.saveSelectedParameters(selectedParameterIds)
+        configStore.saveCustomRanges(customRanges)
     }
 
     private func loadConfiguration() {
         currentMode = configStore.loadMode() ?? .all
         selectedParameterIds = configStore.loadSelectedParameters()
+        customRanges = configStore.loadCustomRanges()
     }
 }
 
@@ -120,6 +184,7 @@ class ConfigurationStore {
     // Keys
     private let modeKey = "autoui.currentMode"
     private let selectedParametersKey = "autoui.selectedParameters"
+    private let customRangesKey = "autoui.customRanges"
 
     // MARK: - Mode
 
@@ -149,10 +214,28 @@ class ConfigurationStore {
         return Set(array)
     }
 
+    // MARK: - Custom Ranges
+
+    func saveCustomRanges(_ ranges: [String: CustomRange]) {
+        let encoder = JSONEncoder()
+        if let data = try? encoder.encode(ranges) {
+            defaults.set(data, forKey: customRangesKey)
+        }
+    }
+
+    func loadCustomRanges() -> [String: CustomRange] {
+        guard let data = defaults.data(forKey: customRangesKey) else {
+            return [:]
+        }
+        let decoder = JSONDecoder()
+        return (try? decoder.decode([String: CustomRange].self, from: data)) ?? [:]
+    }
+
     // MARK: - Reset
 
     func reset() {
         defaults.removeObject(forKey: modeKey)
         defaults.removeObject(forKey: selectedParametersKey)
+        defaults.removeObject(forKey: customRangesKey)
     }
 }

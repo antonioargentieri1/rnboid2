@@ -17,20 +17,32 @@ struct ParameterRow: View {
     let mode: UIMode
 
     var body: some View {
-        HStack(spacing: 12) {
-            // Setup mode: Show checkbox for Live selection
-            if mode == .setup {
-                selectionCheckbox
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 12) {
+                // Setup mode: Show checkbox for Live selection
+                if mode == .setup {
+                    selectionCheckbox
+                }
+
+                // Parameter widget (slider)
+                AutoSlider(parameter: $parameter)
+                    .opacity(mode == .setup ? (isSelected ? 1.0 : 0.5) : 1.0)
             }
 
-            // Parameter widget (slider)
-            AutoSlider(parameter: $parameter)
-                .opacity(mode == .setup ? (isSelected ? 1.0 : 0.5) : 1.0)
+            // Setup mode: Show custom range controls
+            if mode == .setup {
+                customRangeSection
+                    .padding(.leading, mode == .setup ? 44 : 0) // Align with slider
+            }
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
         .background(rowBackground)
         .cornerRadius(8)
+        .onAppear {
+            // Ensure custom range exists for this parameter
+            modeManager.ensureCustomRange(for: parameter)
+        }
     }
 
     // MARK: - Selection Checkbox (Setup Mode)
@@ -46,6 +58,71 @@ struct ParameterRow: View {
                 .foregroundColor(isSelected ? .blue : .gray)
         }
         .buttonStyle(.plain)
+    }
+
+    // MARK: - Custom Range Section
+
+    private var customRangeSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // Custom range toggle
+            Toggle(isOn: Binding(
+                get: { customRange?.enabled ?? false },
+                set: { _ in modeManager.toggleCustomRange(parameter.id) }
+            )) {
+                Text("Custom Range")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .toggleStyle(SwitchToggleStyle(tint: .blue))
+
+            // Range display and slider (shown when enabled)
+            if let range = customRange, range.enabled {
+                VStack(alignment: .leading, spacing: 4) {
+                    // Range label
+                    Text(String(format: "[%.2f - %.2f]", range.customMin, range.customMax))
+                        .font(.caption)
+                        .foregroundColor(.blue)
+
+                    // Range slider
+                    RangeSlider(
+                        minValue: Binding(
+                            get: { range.customMin },
+                            set: { newMin in
+                                modeManager.updateCustomRange(parameter.id, min: newMin, max: range.customMax)
+                            }
+                        ),
+                        maxValue: Binding(
+                            get: { range.customMax },
+                            set: { newMax in
+                                modeManager.updateCustomRange(parameter.id, min: range.customMin, max: newMax)
+                            }
+                        ),
+                        bounds: parameter.info.minimum...parameter.info.maximum,
+                        onValueChanged: { newMin, newMax in
+                            modeManager.updateCustomRange(parameter.id, min: newMin, max: newMax)
+                        }
+                    )
+                    .frame(height: 30)
+
+                    // Original range reference
+                    HStack {
+                        Text("Original:")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        Text(String(format: "[%.2f - %.2f]", parameter.info.minimum, parameter.info.maximum))
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .padding(.top, 4)
+            }
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 6)
+                .fill(Color.gray.opacity(0.1))
+        )
     }
 
     // MARK: - Background
@@ -69,6 +146,10 @@ struct ParameterRow: View {
 
     private var isSelected: Bool {
         modeManager.isParameterSelected(parameter.id)
+    }
+
+    private var customRange: CustomRange? {
+        modeManager.customRanges[parameter.id]
     }
 }
 

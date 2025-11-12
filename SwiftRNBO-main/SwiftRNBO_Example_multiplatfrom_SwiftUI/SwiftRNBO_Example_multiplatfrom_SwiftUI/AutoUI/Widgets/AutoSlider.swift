@@ -11,6 +11,7 @@ import SwiftUI
 /// Auto-generated Slider component
 struct AutoSlider: View {
     @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
+    @EnvironmentObject var modeManager: ModeManager
     @Binding var parameter: RNBOParameter
 
     // Optional customization
@@ -29,7 +30,7 @@ struct AutoSlider: View {
             HStack(spacing: 12) {
                 // Min label
                 if showMinMaxLabels {
-                    ValueLabel(value: parameter.info.minimum, unit: parameter.info.unit)
+                    ValueLabel(value: effectiveRange.min, unit: parameter.info.unit)
                         .frame(minWidth: 50, alignment: .trailing)
                 }
 
@@ -44,13 +45,13 @@ struct AutoSlider: View {
                             Text(displayName)
                         } minimumValueLabel: {
                             if !showMinMaxLabels {
-                                ValueLabel(value: parameter.info.minimum, unit: parameter.info.unit)
+                                ValueLabel(value: effectiveRange.min, unit: parameter.info.unit)
                             } else {
                                 EmptyView()
                             }
                         } maximumValueLabel: {
                             if !showMinMaxLabels {
-                                ValueLabel(value: parameter.info.maximum, unit: parameter.info.unit)
+                                ValueLabel(value: effectiveRange.max, unit: parameter.info.unit)
                             } else {
                                 EmptyView()
                             }
@@ -67,13 +68,13 @@ struct AutoSlider: View {
                             Text(displayName)
                         } minimumValueLabel: {
                             if !showMinMaxLabels {
-                                ValueLabel(value: parameter.info.minimum, unit: parameter.info.unit)
+                                ValueLabel(value: effectiveRange.min, unit: parameter.info.unit)
                             } else {
                                 EmptyView()
                             }
                         } maximumValueLabel: {
                             if !showMinMaxLabels {
-                                ValueLabel(value: parameter.info.maximum, unit: parameter.info.unit)
+                                ValueLabel(value: effectiveRange.max, unit: parameter.info.unit)
                             } else {
                                 EmptyView()
                             }
@@ -87,7 +88,7 @@ struct AutoSlider: View {
 
                 // Max label
                 if showMinMaxLabels {
-                    ValueLabel(value: parameter.info.maximum, unit: parameter.info.unit)
+                    ValueLabel(value: effectiveRange.max, unit: parameter.info.unit)
                         .frame(minWidth: 50, alignment: .leading)
                 }
 
@@ -113,6 +114,10 @@ struct AutoSlider: View {
         // If steps > 0, calculate step size for discrete parameters
         guard parameter.info.steps > 0 else { return nil }
         return 1.0 / Double(parameter.info.steps)
+    }
+
+    private var effectiveRange: (min: Double, max: Double) {
+        modeManager.getEffectiveRange(for: parameter)
     }
 }
 
