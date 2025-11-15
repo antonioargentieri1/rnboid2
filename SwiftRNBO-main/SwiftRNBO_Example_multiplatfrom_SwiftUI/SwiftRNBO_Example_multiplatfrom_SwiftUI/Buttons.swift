@@ -24,25 +24,38 @@ struct Buttons: View {
                 print("Aftertouch")
                 rnbo.sendAftertouch(60, pressure: 50)
             }
+            .buttonStyle(.borderless)
+
             Button("Randomize") {
                 randomize()
             }
+            .buttonStyle(.borderless)
+
             Button("Send message") {
                 let message: [Double] = [220, 330, 0.2, 0.3, 0.5]
                 rnbo.sendMessage(message)
             }
+            .buttonStyle(.borderless)
+
             Button("Play Input") {
                 rnbo.playAudioFile()
             }
+            .buttonStyle(.borderless)
+
             Button("Pause Input") {
                 rnbo.pauseAudioFile()
             }
+            .buttonStyle(.borderless)
+
             Toggle(isOn: $rnbo.showDescription) {
                 Text("Show description")
             }
+            .toggleStyle(.button)
+
             Toggle(isOn: $enableMic) {
                 Text("Mic")
             }
+            .toggleStyle(.button)
             .onChange(of: enableMic) { newValue in
                 rnbo.toggleMic(newValue)
             }

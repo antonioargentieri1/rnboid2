@@ -11,20 +11,23 @@ struct ContentView: View {
     @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
+        HStack(spacing: 0) {
+            // Main content
+            VStack(spacing: 0) {
                 Buttons()
-                Spacer()
-                AudioMeterView()
+                #if !os(tvOS)
+                    if rnbo.showDescription {
+                        DescriptionView()
+                    } else {
+                        Sliders()
+                        AudioKitKeyboard()
+                    }
+                #endif
             }
-            #if !os(tvOS)
-                if rnbo.showDescription {
-                    DescriptionView()
-                } else {
-                    Sliders()
-                    AudioKitKeyboard()
-                }
-            #endif
+
+            // Audio meter on the right side
+            AudioMeterView()
+                .frame(width: 100)
         }
         .padding()
     }
