@@ -1,0 +1,403 @@
+================================================================================
+                  RNBO iOS SYSTEM - QUICK REFERENCE GUIDE
+================================================================================
+
+SYSTEM COMPONENTS (3 LAYERS)
+================================================================================
+
+┌─ LAYER 1: PROJECT GENERATION (Python)
+│  ├─ main.py                    - CLI entry point
+│  ├─ core/replacer.py           - 5-step generation pipeline
+│  ├─ core/analyzer.py           - Export metadata parsing
+│  └─ utils/logger.py            - Logging utilities
+│
+├─ LAYER 2: UI & STATE MANAGEMENT (Swift)
+│  ├─ RNBO/Interface/            - Bridge to C++ (6 files)
+│  ├─ AutoUI/Core/               - State & orchestration (7 files)
+│  ├─ AutoUI/Widgets/            - UI components (3 files)
+│  └─ AutoUI/Views/              - Feature screens (3 files)
+│
+└─ LAYER 3: AUDIO PROCESSING (C++)
+   └─ rnbo::PatcherInterface     - Generated from RNBO export
+
+MAIN DATA FLOW
+================================================================================
+
+GENERATION TIME:
+  RNBO Export → RNBOAnalyzer → IOSReplacer → Xcode Project
+  
+RUNTIME:
+  User Input → AutoSlider → RNBOAudioUnitHostModel → RNBOAudioUnit → C++ Engine
+  C++ Events → RNBOEventHandler → @Published → SwiftUI Re-render
+
+PARAMETER LIFECYCLE
+================================================================================
+
+1. DEFINITION
+   ├─ Source: description.json (RNBO export)
+   ├─ Parsed: RNBODescription → [ParameterInfo]
+   ├─ Wrapped: RNBOParameter (value + info)
+   └─ Display: ParameterInfo fields (min, max, unit, name, etc.)
+
+2. PRESENTATION
+   ├─ AutoSlider renders slider widget
+   ├─ ParameterRow adds checkbox (SETUP mode)
+   └─ Mode determines visibility (LIVE/ALL/SETUP)
+
+3. INTERACTION
+   ├─ User moves slider
+   ├─ sliderBinding.set() called
+   ├─ Effective range computed (custom or original)
+   ├─ mappedValue = range.min + position * range
+   └─ rnbo.setParameterValue(mappedValue, index)
+
+4. COMMUNICATION
+   ├─ setParameterValue() → RNBOAudioUnit (Objective-C)
+   ├─ RNBOAudioUnit → C++ rnbo::PatcherInterface
+   ├─ C++ updates parameter memory
+   └─ Next audio buffer uses new value
+
+5. FEEDBACK
+   ├─ C++ may emit RNBOParameterEvent
+   ├─ RNBOEventHandler.handle() receives it
+   ├─ Updates rnbo.parameters[index].value
+   └─ SwiftUI reactively re-renders
+
+KEY FILES & THEIR ROLES
+================================================================================
+
+RNBODescription.swift
+  ├─ Decodable struct from description.json
+  ├─ Contains: parameters[], numInputChannels, numOutputChannels, meta
+  └─ Loaded once at app startup
+
+RNBOParameter.swift
+  ├─ Wraps ParameterInfo with current value
+  ├─ Computed property: valueNormalized (0.0-1.0)
+  └─ Handles exponential scaling: pow(normalized, exponent)
+
+RNBOAudioUnitHostModel.swift
+  ├─ @Published var parameters: [RNBOParameter]
+  ├─ Bridge to RNBOAudioUnit
+  ├─ Methods: setParameterValue(), sendNoteOn(), sendMIDI()
+  └─ Lifetime: App startup → shutdown
+
+AutoUIView.swift
+  ├─ Main orchestrator (root view)
+  ├─ Manages: ModeManager, PresetManager, XYPadManager
+  ├─ Displays: Mode selector, parameter list, presets UI
+  └─ Logic: ParameterFilter for visibility
+
+ModeManager.swift
+  ├─ @Published var currentMode: UIMode (.live, .all, .setup, .presets)
+  ├─ @Published var selectedParameterIds: Set<String>
+  ├─ @Published var customRanges: [String: CustomRange]
+  ├─ Logic: Mode transitions, parameter selection, range calculation
+  └─ Persists: UserDefaults (selectedIds, customRanges)
+
+PresetManager.swift
+  ├─ @Published var savedPresets: [Preset]
+  ├─ @Published var quickPresets: [Preset] (max 8)
+  ├─ Methods: saveCurrentAsPreset(), loadPreset(), interpolate()
+  ├─ Interpolation: 60fps timer, easeInOutQuad(), configurable duration
+  └─ Storage: PresetStorage → UserDefaults JSON
+
+AutoSlider.swift
+  ├─ Rendered slider for each parameter
+  ├─ Custom binding: sliderBinding
+  │   ├─ get: parameter.value → normalized (0-1)
+  │   └─ set: slider position (0-1) → mapped value → C++
+  ├─ Displays: Parameter name, min/max labels, current value
+  └─ Features: Discrete steps support, unit display
+
+ParameterRow.swift
+  ├─ Container for each parameter
+  ├─ Includes: AutoSlider + optional controls
+  ├─ SETUP mode: Checkbox, custom range toggle, XY Pad assignment
+  ├─ Live mode: Just the slider
+  └─ Features: Selection state, custom range section, XY Pad section
+
+RNBO C++ BRIDGE
+================================================================================
+
+RNBOAudioUnit (Objective-C++)
+  ├─ Registers as AudioUnit
+  ├─ Instantiated: out-of-process via AVAudioUnit
+  ├─ Interface methods:
+  │   ├─ setParameterValue(index: Int, value: Float)
+  │   ├─ getParameterValue(index: Int) → Float
+  │   ├─ setParameterValueNormalized(index: Int, normalized: Float)
+  │   ├─ sendNoteOn(pitch, velocity, channel)
+  │   └─ setEventHandler(RNBOEventHandler)
+  └─ Calls C++ rnbo::PatcherInterface internally
+
+RNBO C++ Engine (Generated)
+  ├─ Created from RNBO export
+  ├─ Core: rnbo::PatcherInterface class
+  ├─ Methods: process(), setParameterValue(), getParameterValue()
+  ├─ Callbacks: parameter events, outport messages
+  └─ Memory: Audio buffers, parameter storage, dsp code
+
+STATE MANAGEMENT ARCHITECTURE
+================================================================================
+
+Root Observable: RNBOAudioUnitHostModel
+  └─ @Published var parameters: [RNBOParameter]
+     ├─ Source of truth for all parameter states
+     ├─ Updated by: User input (slider) + C++ events
+     └─ Triggers: All dependent views re-render
+
+Child Observable: ModeManager
+  ├─ @Published var currentMode: UIMode
+  ├─ @Published var selectedParameterIds: Set<String>
+  ├─ @Published var customRanges: [String: CustomRange]
+  └─ Logic: Parameter visibility, range calculation
+
+Child Observable: PresetManager
+  ├─ @Published var savedPresets: [Preset]
+  ├─ @Published var quickPresets: [Preset]
+  └─ Logic: Save/load, interpolation, morphing
+
+Child Observable: XYPadManager
+  ├─ @Published var xyPadMappings: [String: XYPadMapping]
+  └─ Logic: 2D parameter mapping
+
+All Persist: UserDefaults + JSON Encoding
+
+PRESET STRUCTURE
+================================================================================
+
+Preset {
+  id: UUID                              ← Unique identifier
+  name: String                          ← User-friendly name
+  timestamp: Date                       ← When saved
+  parameterValues: [String: Double]     ← All parameter values
+  customRanges: [String: CustomRange]   ← Custom min/max per param
+  liveParameters: Set<String>           ← Which params show in LIVE
+  xyPadMappings: [String: XYPadMapping] ← 2D mapping per param
+  isQuickPreset: Bool                   ← Quick preset flag
+}
+
+THREE UI MODES
+================================================================================
+
+ALL MODE (Default)
+  ├─ Shows: All parameters with visible=true
+  ├─ Optimal for: Discovery, parameter exploration
+  ├─ Features: Simple slider per parameter
+  └─ Use case: Initial setup, learning the patch
+
+LIVE MODE
+  ├─ Shows: Only selected parameters
+  ├─ Optimal for: Performance, real-time use
+  ├─ Features: Quick presets (8 buttons), XY Pad, minimal UI
+  └─ Use case: Playing/performing, live control
+  ├─ Note: Must have at least one parameter selected
+  └─ When empty: Falls back to ALL mode
+
+SETUP MODE
+  ├─ Shows: All parameters with checkboxes
+  ├─ Optimal for: Configuration, parameter selection
+  ├─ Features: 
+  │   ├─ Checkboxes (toggle LIVE visibility)
+  │   ├─ Custom range toggle + slider
+  │   └─ XY Pad axis assignment
+  └─ Use case: Configuring which params appear in LIVE
+
+PRESETS MODE
+  ├─ Shows: Preset manager UI
+  ├─ Features:
+  │   ├─ Save current configuration as preset
+  │   ├─ Load/delete/rename saved presets
+  │   ├─ Toggle interpolation
+  │   └─ Set interpolation duration
+  └─ Use case: Preset management
+
+PARAMETER NORMALIZATION
+================================================================================
+
+RNBO Model:
+  value ∈ [minimum, maximum] with exponential scaling
+  value_normalized ∈ [0.0, 1.0]
+  
+  Forward (denormalize):
+    value = min + pow(normalized, exponent) * (max - min)
+  
+  Reverse (normalize):
+    normalized = pow((value - min) / (max - min), 1/exponent)
+
+Example (Frequency):
+  min=20, max=20000, exponent=2.0
+  
+  slider at 50%:
+    normalized = 0.5
+    exponentiatedValue = pow(0.5, 2.0) = 0.25
+    actual_value = 20 + 0.25 * 19980 = 5005 Hz
+
+INTERPOLATION SYSTEM
+================================================================================
+
+Trigger: User taps preset to load
+
+If interpolationEnabled:
+  ├─ Step 1: Capture start values
+  │   └─ interpolationStartValues[paramId] = current value
+  │
+  ├─ Step 2: Set target values
+  │   └─ interpolationTargetValues[paramId] = preset value
+  │
+  ├─ Step 3: Start 60fps timer
+  │   └─ interval = 1.0 / 60.0 ≈ 16.67ms
+  │
+  ├─ Step 4 (each frame):
+  │   ├─ elapsed = currentTime - startTime
+  │   ├─ progress = elapsed / duration (0.0 → 1.0)
+  │   ├─ eased = easeInOutQuad(progress)
+  │   ├─ for each param:
+  │   │   value = start + (target - start) * eased
+  │   │   rnbo.setParameterValue(value, index)
+  │   └─ if progress >= 1.0: stop timer
+  │
+  └─ Result: Smooth morphing over duration (default 1000ms)
+
+Else (instant load):
+  ├─ Apply parameter values immediately
+  ├─ Apply custom ranges immediately
+  ├─ Apply live selection immediately
+  └─ Apply XY mappings immediately
+
+XCODE PROJECT GENERATION (5 STEPS)
+================================================================================
+
+1. VERIFY PATHS
+   ├─ Check template exists
+   ├─ Check AutoUI files present (13 files)
+   ├─ Check export exists
+   └─ Check output directory
+
+2. ANALYZE EXPORT
+   ├─ Parse description.json
+   ├─ Extract parameters, audio format info
+   ├─ Count presets, find library files
+   └─ Validate C++ source files
+
+3. COPY TEMPLATE
+   ├─ Copy SwiftRNBO_Example_multiplatfrom_SwiftUI to output
+   └─ Full recursive copy of all project files
+
+4. REPLACE RNBO EXPORT
+   ├─ Clear RNBO/Export/ directory
+   ├─ Copy description.json
+   ├─ Copy C++ source files (*.cpp, *.h)
+   ├─ Copy rnbo/ framework directory
+   └─ Copy optional files (presets.json, dependencies.json)
+
+5. UPDATE PROJECT CONFIG
+   ├─ Generate bundle ID: com.rnbo.{appname}
+   ├─ Find project.pbxproj
+   ├─ Replace old bundle ID with new one
+   └─ Write updated project file
+
+Result: Ready-to-build Xcode project
+
+PARAMETER INDEX MAPPING
+================================================================================
+
+description.json defines:
+  parameters: [
+    { index: 0, paramId: "frequency", ... },
+    { index: 1, paramId: "resonance", ... }
+  ]
+
+At runtime:
+  rnbo.parameters[0] ↔ "frequency"
+  rnbo.parameters[1] ↔ "resonance"
+
+When slider changes:
+  AutoSlider → rnbo.setParameterValue(value, index=0)
+            → RNBOAudioUnit.setParameterValue(0, Float)
+            → C++ rnbo::PatcherInterface::setParameterValue(0, value)
+            → Parameter storage updated
+            → Next audio buffer processes with new frequency
+
+DEBUGGING CHECKLIST
+================================================================================
+
+Description Not Loading:
+  ✓ Is description.json in Bundle.main?
+  ✓ Try: Bundle.main.url(forResource: "description", withExtension: "json")
+  ✓ Check JSON structure matches RNBODescription struct
+
+Parameters Not Responding:
+  ✓ Is parameter.info.index correct?
+  ✓ Does C++ accept setParameterValue() calls?
+  ✓ Add print statements in RNBOAudioUnitHostModel.setParameterValue()
+
+No Audio Changes:
+  ✓ Is RNBO C++ code running? (Check audioUnit status)
+  ✓ Is setParameterValue() being called?
+  ✓ Is parameter.info.index mapped to correct C++ parameter?
+  ✓ Check audio buffer format (sample rate, channels)
+
+Presets Not Saving:
+  ✓ Check UserDefaults.standard available
+  ✓ Verify JSONEncoder handles all Preset fields
+  ✓ Check disk space available
+
+Mode Transitions Not Working:
+  ✓ Is ModeManager @StateObject created?
+  ✓ Is currentMode Binding correct?
+  ✓ Check ParameterFilter logic for visibility
+
+Custom Ranges Not Applied:
+  ✓ Is ModeManager.customRanges being updated?
+  ✓ Check AutoSlider.effectiveRange calculation
+  ✓ Verify custom range enabled flag
+
+FILE PATHS (Absolute)
+================================================================================
+
+Python Replacer:
+  /home/user/rnboid2/rnbo_replacer_ios/main.py
+  /home/user/rnboid2/rnbo_replacer_ios/core/replacer.py
+  /home/user/rnboid2/rnbo_replacer_ios/core/analyzer.py
+  /home/user/rnboid2/rnbo_replacer_ios/utils/logger.py
+
+Swift Implementation:
+  /home/user/rnboid2/SwiftRNBO-main/SwiftRNBO_Example_multiplatfrom_SwiftUI/SwiftRNBO_Example_multiplatfrom_SwiftUI/
+
+  RNBO/Interface/:
+    RNBOParameter.swift
+    RNBODescription.swift
+    RNBOAudioUnitHostModel.swift
+    RNBOAudioEngine.swift
+    RNBOEventHandler.swift
+    MIDIHelpers.swift
+
+  AutoUI/Core/:
+    AutoUIView.swift
+    ModeManager.swift
+    ParameterFilter.swift
+    PresetManager.swift
+    Preset.swift
+    XYPadMapping.swift
+    XYPadManager.swift
+
+  AutoUI/Widgets/:
+    AutoSlider.swift
+    ParameterRow.swift
+    RangeSlider.swift
+
+  AutoUI/Views/:
+    PresetsManagerView.swift
+    QuickPresetsView.swift
+    XYPadView.swift
+
+Analysis Documents:
+  /home/user/rnboid2/RNBO_iOS_SYSTEM_ANALYSIS.md (681 lines)
+  /home/user/rnboid2/RNBO_iOS_DIAGRAMS_AND_EXAMPLES.md (620 lines)
+  /home/user/rnboid2/RNBO_iOS_QUICK_REFERENCE.txt (this file)
+
+================================================================================
+END OF QUICK REFERENCE
+================================================================================
