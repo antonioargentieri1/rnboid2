@@ -16,6 +16,9 @@ class RNBOAudioEngine {
     private let inputMixer: AVAudioMixerNode
     private let microphoneVolumeMixer: AVAudioMixerNode
 
+    // Audio level metering
+    var onAudioLevelUpdate: ((Float, Float) -> Void)?
+
     private func initInput() {
         let input = engine.inputNode
         // let format = input.inputFormat(forBus: 0)
@@ -130,8 +133,55 @@ class RNBOAudioEngine {
         engine.prepare()
         try! engine.start()
 
+        // Install audio tap for level metering
+        installAudioTap()
+
         // must be called only when app is didBecomeActive
         // play()
+    }
+
+    private func installAudioTap() {
+        let format = engine.mainMixerNode.outputFormat(forBus: 0)
+
+        engine.mainMixerNode.installTap(onBus: 0, bufferSize: 1024, format: format) { [weak self] buffer, time in
+            guard let self = self else { return }
+
+            // Calculate RMS levels for left and right channels
+            guard let channelData = buffer.floatChannelData else { return }
+            let channelCount = Int(buffer.format.channelCount)
+            let frameLength = Int(buffer.frameLength)
+
+            var leftLevel: Float = 0.0
+            var rightLevel: Float = 0.0
+
+            if channelCount > 0 {
+                // Left channel
+                let leftData = channelData[0]
+                var sum: Float = 0.0
+                for frame in 0..<frameLength {
+                    let sample = leftData[frame]
+                    sum += sample * sample
+                }
+                leftLevel = sqrt(sum / Float(frameLength))
+            }
+
+            if channelCount > 1 {
+                // Right channel
+                let rightData = channelData[1]
+                var sum: Float = 0.0
+                for frame in 0..<frameLength {
+                    let sample = rightData[frame]
+                    sum += sample * sample
+                }
+                rightLevel = sqrt(sum / Float(frameLength))
+            } else {
+                // Mono - use left for both
+                rightLevel = leftLevel
+            }
+
+            // Callback with levels (on audio thread, will need to dispatch to main)
+            self.onAudioLevelUpdate?(leftLevel, rightLevel)
+        }
     }
 
     func getAudioUnit() -> RNBOAudioUnit {

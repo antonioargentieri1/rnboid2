@@ -12,7 +12,11 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Buttons()
+            HStack {
+                Buttons()
+                Spacer()
+                AudioMeterView()
+            }
             #if !os(tvOS)
                 if rnbo.showDescription {
                     DescriptionView()

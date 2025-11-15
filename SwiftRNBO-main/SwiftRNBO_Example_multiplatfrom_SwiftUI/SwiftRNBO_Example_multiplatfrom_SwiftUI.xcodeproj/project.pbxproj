@@ -14,6 +14,7 @@
 		AF865DE82B0A381B0019FB28 /* MIDIHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF865DE72B0A381B0019FB28 /* MIDIHelpers.swift */; };
 		AFEBC8E22B079BD80097D64B /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFEBC8E12B079BD80097D64B /* Buttons.swift */; };
 		AFEBC8E42B079C150097D64B /* AudioKitKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFEBC8E32B079C150097D64B /* AudioKitKeyboard.swift */; };
+		A0F726A17142472C9A29A9FF /* AudioMeterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C01CCAB2C3C45D6803209E3 /* AudioMeterView.swift */; };
 		AFF2B41E29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */; };
 		AFF2B42029A2090200068DD0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B41F29A2090200068DD0 /* ContentView.swift */; };
 		AFF2B42229A2090300068DD0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AFF2B42129A2090300068DD0 /* Assets.xcassets */; };
@@ -45,6 +46,7 @@
 		AF865DE72B0A381B0019FB28 /* MIDIHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDIHelpers.swift; sourceTree = "<group>"; };
 		AFA214B62B20D01000BCD4E6 /* SwiftRNBO-Example-multiplatfrom-SwiftUI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SwiftRNBO-Example-multiplatfrom-SwiftUI-Info.plist"; sourceTree = SOURCE_ROOT; };
 		AFEBC8E12B079BD80097D64B /* Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
+		9C01CCAB2C3C45D6803209E3 /* AudioMeterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMeterView.swift; sourceTree = "<group>"; };
 		AFEBC8E32B079C150097D64B /* AudioKitKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioKitKeyboard.swift; sourceTree = "<group>"; };
 		AFF2B41A29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftRNBO_Example_multiplatfrom_SwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift; sourceTree = "<group>"; };
@@ -261,6 +263,7 @@
 				AFF2B4F729A20A3500068DD0 /* Sliders.swift */,
 				AFFCBE452B09575300800A23 /* SliderView.swift */,
 				AFEBC8E12B079BD80097D64B /* Buttons.swift */,
+				9C01CCAB2C3C45D6803209E3 /* AudioMeterView.swift */,
 				AFEBC8E32B079C150097D64B /* AudioKitKeyboard.swift */,
 				AFF2B42129A2090300068DD0 /* Assets.xcassets */,
 				AFF2B42329A2090300068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI.entitlements */,
@@ -742,6 +745,7 @@
 				AF865DE82B0A381B0019FB28 /* MIDIHelpers.swift in Sources */,
 				AF4B40902B061DDD00FAACBF /* RNBOEventHandler.mm in Sources */,
 				AFEBC8E22B079BD80097D64B /* Buttons.swift in Sources */,
+				A0F726A17142472C9A29A9FF /* AudioMeterView.swift in Sources */,
 				AFF2B4F229A2094D00068DD0 /* rnbo_source.cpp in Sources */,
 				AF4B40932B06326800FAACBF /* RNBOEventHandler.swift in Sources */,
 				AFEBC8E42B079C150097D64B /* AudioKitKeyboard.swift in Sources */,

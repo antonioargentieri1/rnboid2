@@ -15,6 +15,8 @@ class RNBOAudioUnitHostModel: ObservableObject {
     private let eventHandler = RNBOEventHandler()
     @Published var parameters: [RNBOParameter]
     @Published var showDescription: Bool = false
+    @Published var audioLevelLeft: Float = 0.0
+    @Published var audioLevelRight: Float = 0.0
     let description: RNBODescription?
 
     init() {
@@ -29,6 +31,14 @@ class RNBOAudioUnitHostModel: ObservableObject {
 
         audioUnit = audioEngine.getAudioUnit()
         parameters = description?.getParametersArray() ?? []
+
+        // Setup audio level callback
+        audioEngine.onAudioLevelUpdate = { [weak self] leftLevel, rightLevel in
+            DispatchQueue.main.async {
+                self?.audioLevelLeft = leftLevel
+                self?.audioLevelRight = rightLevel
+            }
+        }
     }
 
     func playAudioFile() {
